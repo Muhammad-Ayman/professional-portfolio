@@ -2,8 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Mail, Linkedin, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import SEOHead from "@/components/SEOHead";
-import { pageSEO } from "@/lib/seo";
-import { profile } from "@/data/profile";
+import { buildPageSEO } from "@/lib/seo";
+import { Spinner } from "@/components/ui/spinner";
+import { useProfile } from "@/hooks/useContent";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ export default function Contact() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const { data: profile, isLoading, isError } = useProfile();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -33,9 +35,33 @@ export default function Contact() {
     }, 3000);
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="flex items-center gap-3 text-foreground/60">
+          <Spinner className="size-6" />
+          <span>Loading contact details…</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !profile) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center text-foreground/70">
+          <p className="text-lg font-semibold">We couldn't load contact details.</p>
+          <p className="text-sm">Please try again later.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const pageMetadata = buildPageSEO(profile).contact;
+
   return (
     <div className="w-full">
-      <SEOHead metadata={pageSEO.contact} path="/contact" />
+      <SEOHead metadata={pageMetadata} path="/contact" />
 
       {/* Hero Section */}
       <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-20">

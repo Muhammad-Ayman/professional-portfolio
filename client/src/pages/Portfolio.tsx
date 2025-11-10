@@ -3,22 +3,26 @@ import { Link } from "wouter";
 import { ArrowRight, Filter } from "lucide-react";
 import { useState } from "react";
 import SEOHead from "@/components/SEOHead";
-import { pageSEO } from "@/lib/seo";
-import { caseStudies } from "@/data/caseStudies";
+import { buildPageSEO } from "@/lib/seo";
+import { Spinner } from "@/components/ui/spinner";
+import { useCaseStudies, useProfile } from "@/hooks/useContent";
 
 export default function Portfolio() {
   const [selectedSector, setSelectedSector] = useState("all");
+  const { data: caseStudies, isLoading, isError } = useCaseStudies();
+  const { data: profile } = useProfile();
 
-  const sectors = ["all", ...Array.from(new Set(caseStudies.map((cs) => cs.sector)))];
+  const sectors = ["all", ...(caseStudies ? Array.from(new Set(caseStudies.map((cs) => cs.sector))) : [])];
+  const pageMetadata = buildPageSEO(profile).portfolio;
 
   const filteredCaseStudies =
     selectedSector === "all"
-      ? caseStudies
-      : caseStudies.filter((cs) => cs.sector === selectedSector);
+      ? caseStudies ?? []
+      : (caseStudies ?? []).filter((cs) => cs.sector === selectedSector);
 
   return (
     <div className="w-full">
-      <SEOHead metadata={pageSEO.portfolio} path="/portfolio" />
+      <SEOHead metadata={pageMetadata} path="/portfolio" />
 
       {/* Hero Section */}
       <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-20">
@@ -45,29 +49,50 @@ export default function Portfolio() {
             <h3 className="text-sm font-semibold uppercase tracking-wide">Filter by Sector</h3>
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            {sectors.map((sector) => (
-              <button
-                key={sector}
-                onClick={() => setSelectedSector(sector)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 capitalize ${
-                  selectedSector === sector
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-foreground/5 text-foreground hover:bg-foreground/10"
-                }`}
-              >
-                {sector === "all" ? "All Sectors" : sector}
-              </button>
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="flex items-center gap-3 text-foreground/60">
+              <Spinner className="size-5" />
+              <span>Loading sectors…</span>
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-3">
+              {sectors.map((sector) => (
+                <button
+                  key={sector}
+                  onClick={() => setSelectedSector(sector)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 capitalize ${
+                    selectedSector === sector
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-foreground/5 text-foreground hover:bg-foreground/10"
+                  }`}
+                >
+                  {sector === "all" ? "All Sectors" : sector}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
       {/* Case Studies Grid */}
       <section className="section-padding">
         <div className="container max-w-6xl">
-          <div className="space-y-16">
-            {filteredCaseStudies.map((caseStudy, index) => (
+          {isLoading && (
+            <div className="flex justify-center py-24">
+              <div className="flex items-center gap-3 text-foreground/60">
+                <Spinner className="size-6" />
+                <span>Loading case studies…</span>
+              </div>
+            </div>
+          )}
+          {!isLoading && isError && (
+            <div className="text-center text-foreground/60 py-24">
+              We couldn't load the portfolio right now. Please try again later.
+            </div>
+          )}
+          {!isLoading && !isError && (
+            <div className="space-y-16">
+              {filteredCaseStudies.map((caseStudy, index) => (
               <div
                 key={caseStudy.id}
                 className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center pb-16 border-b border-foreground/10 last:border-b-0 last:pb-0 animate-fadeInUp"
@@ -139,10 +164,11 @@ export default function Portfolio() {
                   </p>
                 </div>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
-          {filteredCaseStudies.length === 0 && (
+          {!isLoading && !isError && filteredCaseStudies.length === 0 && (
             <div className="text-center py-16">
               <p className="text-lg text-foreground/70">
                 No case studies found in this sector. Try a different filter.

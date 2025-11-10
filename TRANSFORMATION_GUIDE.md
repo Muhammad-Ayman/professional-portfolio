@@ -36,7 +36,7 @@ This portfolio has been transformed from a generic web developer portfolio into 
 - Latest insights preview
 - Call-to-action section
 
-**Data Source**: `client/src/data/profile.ts` and `client/src/data/caseStudies.ts`
+**Data Source**: CMS API (`GET /api/content/profile`, `GET /api/content/case-studies`)
 
 ### 2. About Page (`/about`)
 **Purpose**: Build trust through storytelling and demonstrate expertise
@@ -50,7 +50,7 @@ This portfolio has been transformed from a generic web developer portfolio into 
 - Regions served (4 regions)
 - Professional approach (4-step methodology)
 
-**Data Source**: `client/src/data/profile.ts`
+**Data Source**: CMS API (`GET /api/content/profile`)
 
 ### 3. Portfolio Page (`/portfolio`)
 **Purpose**: Showcase major wins and business impact
@@ -65,7 +65,7 @@ This portfolio has been transformed from a generic web developer portfolio into 
   - Outcome and results
   - Call-to-action
 
-**Data Source**: `client/src/data/caseStudies.ts`
+**Data Source**: CMS API (`GET /api/content/case-studies`)
 
 ### 4. Insights Page (`/insights`)
 **Purpose**: Establish thought leadership
@@ -80,7 +80,7 @@ This portfolio has been transformed from a generic web developer portfolio into 
   - Full content
   - Email subscription CTA
 
-**Data Source**: `client/src/data/insights.ts`
+**Data Source**: CMS API (`GET /api/content/insights`)
 
 ### 5. Contact Page (`/contact`)
 **Purpose**: Facilitate direct communication
@@ -94,11 +94,11 @@ This portfolio has been transformed from a generic web developer portfolio into 
 - Response time expectation
 - FAQ section with 4 common questions
 
-**Data Source**: `client/src/data/profile.ts`
+**Data Source**: CMS API (`GET /api/content/profile`)
 
 ## Data Structure
 
-### Profile Data (`client/src/data/profile.ts`)
+### Profile Data (`server/data/profile.json` · `GET /api/content/profile`)
 ```typescript
 {
   name: string
@@ -118,7 +118,7 @@ This portfolio has been transformed from a generic web developer portfolio into 
 }
 ```
 
-### Case Studies (`client/src/data/caseStudies.ts`)
+### Case Studies (`server/data/caseStudies.json` · `GET /api/content/case-studies`)
 ```typescript
 {
   id: string
@@ -134,7 +134,7 @@ This portfolio has been transformed from a generic web developer portfolio into 
 }
 ```
 
-### Insights (`client/src/data/insights.ts`)
+### Insights (`server/data/insights.json` · `GET /api/content/insights`)
 ```typescript
 {
   id: string
@@ -152,57 +152,45 @@ This portfolio has been transformed from a generic web developer portfolio into 
 
 ### 1. Update Personal Information
 
-Edit `/client/src/data/profile.ts`:
-```typescript
-export const profile = {
-  name: "Your Name",
-  title: "Your Title",
-  tagline: "Your tagline",
-  email: "your@email.com",
-  phone: "+1 (555) 123-4567",
-  location: "City, State",
-  linkedin: "https://linkedin.com/in/yourprofile",
-  // ... rest of profile
-};
+Call `PUT /api/content/profile` with the full profile payload (requires `Authorization: Bearer <CMS_ADMIN_TOKEN>`), or edit `server/data/profile.json` while the server is stopped. Example:
+
+```bash
+curl -X PUT http://localhost:4000/api/content/profile \
+  -H "Authorization: Bearer $CMS_ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{ "name": "Your Name", "...": "..." }'
 ```
 
 ### 2. Add/Update Case Studies
 
-Edit `/client/src/data/caseStudies.ts`:
-```typescript
-{
-  id: "7",
-  title: "Your Project Title",
-  client: "Client Name",
-  sector: "Sector Name",
-  contractValue: "$XXM",
-  outcome: "Won - Description",
-  description: "Project description...",
-  keyAchievements: [
-    "Achievement 1",
-    "Achievement 2",
-    "Achievement 3",
-    "Achievement 4",
-  ],
-  image: "https://images.unsplash.com/...",
-  featured: true, // Set to true to show on home page
-}
+- Create: `POST /api/content/case-studies`
+- Update: `PUT /api/content/case-studies/:id`
+- Delete: `DELETE /api/content/case-studies/:id`
+
+Each endpoint updates `server/data/caseStudies.json`. IDs are generated automatically if omitted. Example create request:
+
+```bash
+curl -X POST http://localhost:4000/api/content/case-studies \
+  -H "Authorization: Bearer $CMS_ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{ "title": "Your Project", "sector": "Enterprise Technology", "...": "..." }'
 ```
 
 ### 3. Add/Update Insights
 
-Edit `/client/src/data/insights.ts`:
-```typescript
-{
-  id: "5",
-  title: "Article Title",
-  excerpt: "Short excerpt for preview",
-  content: "Full article content in markdown or plain text",
-  category: "Category Name",
-  date: "2025-10-22",
-  readTime: "5 min read",
-  featured: true,
-}
+Use the equivalent insight endpoints:
+
+- `POST /api/content/insights`
+- `PUT /api/content/insights/:id`
+- `DELETE /api/content/insights/:id`
+
+These calls persist to `server/data/insights.json`. Example update:
+
+```bash
+curl -X PUT http://localhost:4000/api/content/insights/2 \
+  -H "Authorization: Bearer $CMS_ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{ "readTime": "6 min read" }'
 ```
 
 ### 4. Update Colors

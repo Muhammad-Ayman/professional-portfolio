@@ -2,16 +2,46 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { ArrowRight, Award, Users, TrendingUp } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
-import { pageSEO } from "@/lib/seo";
-import { profile } from "@/data/profile";
-import { caseStudies } from "@/data/caseStudies";
+import { buildPageSEO } from "@/lib/seo";
+import { Spinner } from "@/components/ui/spinner";
+import { useCaseStudies, useProfile } from "@/hooks/useContent";
 
 export default function Home() {
-  const featuredCaseStudies = caseStudies.filter((cs) => cs.featured).slice(0, 3);
+  const { data: profile, isLoading: isProfileLoading, isError: isProfileError } = useProfile();
+  const {
+    data: caseStudies,
+    isLoading: isCaseStudiesLoading,
+    isError: isCaseStudiesError,
+  } = useCaseStudies();
+
+  const featuredCaseStudies = (caseStudies ?? []).filter((cs) => cs.featured).slice(0, 3);
+  const pageMetadata = profile ? buildPageSEO(profile).home : buildPageSEO().home;
+
+  if (isProfileLoading && !profile) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="flex items-center gap-3 text-foreground/60">
+          <Spinner className="size-6" />
+          <span>Loading portfolio…</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (isProfileError || !profile) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center text-foreground/70">
+          <p className="text-lg font-semibold">We couldn't load the profile content.</p>
+          <p className="text-sm">Please try refreshing the page.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
-      <SEOHead metadata={pageSEO.home} path="/" />
+      <SEOHead metadata={pageMetadata} path="/" />
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
@@ -39,25 +69,25 @@ export default function Home() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12 py-8 border-t border-b border-foreground/10">
               <div>
                 <div className="text-3xl md:text-4xl font-display font-bold text-primary">
-                  {profile.stats.years}
+                  {isProfileLoading ? <Spinner className="size-6" /> : profile.stats.years}
                 </div>
                 <p className="text-sm text-foreground/60 mt-2">Years Experience</p>
               </div>
               <div>
                 <div className="text-3xl md:text-4xl font-display font-bold text-primary">
-                  {profile.stats.proposals}
+                  {isProfileLoading ? <Spinner className="size-6" /> : profile.stats.proposals}
                 </div>
                 <p className="text-sm text-foreground/60 mt-2">Winning Proposals</p>
               </div>
               <div>
                 <div className="text-3xl md:text-4xl font-display font-bold text-primary">
-                  {profile.stats.clients}
+                  {isProfileLoading ? <Spinner className="size-6" /> : profile.stats.clients}
                 </div>
                 <p className="text-sm text-foreground/60 mt-2">Clients Served</p>
               </div>
               <div>
                 <div className="text-3xl md:text-4xl font-display font-bold text-primary">
-                  {profile.stats.successRate}
+                  {isProfileLoading ? <Spinner className="size-6" /> : profile.stats.successRate}
                 </div>
                 <p className="text-sm text-foreground/60 mt-2">Success Rate</p>
               </div>
@@ -97,7 +127,17 @@ export default function Home() {
           </div>
 
           <div className="space-y-12">
-            {featuredCaseStudies.map((caseStudy, index) => (
+            {isCaseStudiesLoading && (
+              <div className="flex justify-center py-16">
+                <div className="flex items-center gap-3 text-foreground/60">
+                  <Spinner className="size-6" />
+                  <span>Loading case studies…</span>
+                </div>
+              </div>
+            )}
+            {!isCaseStudiesLoading &&
+              !isCaseStudiesError &&
+              featuredCaseStudies.map((caseStudy, index) => (
               <div
                 key={caseStudy.id}
                 className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center animate-fadeInUp"
@@ -151,7 +191,12 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
-            ))}
+              ))}
+            {!isCaseStudiesLoading && (isCaseStudiesError || featuredCaseStudies.length === 0) && (
+              <div className="text-center text-foreground/60 py-16">
+                No featured case studies available right now.
+              </div>
+            )}
           </div>
         </div>
       </section>

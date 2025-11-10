@@ -2,13 +2,40 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { ArrowRight, Globe, Briefcase, Users } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
-import { pageSEO } from "@/lib/seo";
-import { profile } from "@/data/profile";
+import { buildPageSEO } from "@/lib/seo";
+import { Spinner } from "@/components/ui/spinner";
+import { useProfile } from "@/hooks/useContent";
 
 export default function About() {
+  const { data: profile, isLoading, isError } = useProfile();
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="flex items-center gap-3 text-foreground/60">
+          <Spinner className="size-6" />
+          <span>Loading profile…</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !profile) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center text-foreground/70">
+          <p className="text-lg font-semibold">We couldn't load the profile content.</p>
+          <p className="text-sm">Please try again later.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const pageMetadata = buildPageSEO(profile).about;
+
   return (
     <div className="w-full">
-      <SEOHead metadata={pageSEO.about} path="/about" />
+      <SEOHead metadata={pageMetadata} path="/about" />
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">

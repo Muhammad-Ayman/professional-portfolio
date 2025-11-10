@@ -3,21 +3,25 @@ import { Link } from "wouter";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
 import { useState } from "react";
 import SEOHead from "@/components/SEOHead";
-import { pageSEO } from "@/lib/seo";
-import { insights } from "@/data/insights";
+import { buildPageSEO } from "@/lib/seo";
+import { Spinner } from "@/components/ui/spinner";
+import { useInsights, useProfile } from "@/hooks/useContent";
 
 export default function Insights() {
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const { data: insights, isLoading, isError } = useInsights();
+  const { data: profile } = useProfile();
+  const pageMetadata = buildPageSEO(profile).insights;
 
-  const categories = ["all", ...Array.from(new Set(insights.map((i) => i.category)))];
+  const categories = ["all", ...(insights ? Array.from(new Set(insights.map((i) => i.category))) : [])];
   const filteredInsights =
     selectedCategory === "all"
-      ? insights
-      : insights.filter((i) => i.category === selectedCategory);
+      ? insights ?? []
+      : (insights ?? []).filter((i) => i.category === selectedCategory);
 
   return (
     <div className="w-full">
-      <SEOHead metadata={pageSEO.insights} path="/insights" />
+      <SEOHead metadata={pageMetadata} path="/insights" />
 
       {/* Hero Section */}
       <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-20">
@@ -39,29 +43,50 @@ export default function Insights() {
       {/* Filter Section */}
       <section className="py-12 border-b border-foreground/10">
         <div className="container max-w-6xl">
-          <div className="flex flex-wrap gap-3">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 capitalize ${
-                  selectedCategory === category
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-foreground/5 text-foreground hover:bg-foreground/10"
-                }`}
-              >
-                {category === "all" ? "All Articles" : category}
-              </button>
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="flex items-center gap-3 text-foreground/60">
+              <Spinner className="size-5" />
+              <span>Loading categories…</span>
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-3">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 capitalize ${
+                    selectedCategory === category
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-foreground/5 text-foreground hover:bg-foreground/10"
+                  }`}
+                >
+                  {category === "all" ? "All Articles" : category}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
       {/* Articles Grid */}
       <section className="section-padding">
         <div className="container max-w-4xl">
-          <div className="space-y-12">
-            {filteredInsights.map((article, index) => (
+          {isLoading && (
+            <div className="flex justify-center py-16">
+              <div className="flex items-center gap-3 text-foreground/60">
+                <Spinner className="size-6" />
+                <span>Loading insights…</span>
+              </div>
+            </div>
+          )}
+          {!isLoading && isError && (
+            <div className="text-center text-foreground/60 py-16">
+              We couldn't load insights right now. Please try again later.
+            </div>
+          )}
+          {!isLoading && !isError && (
+            <div className="space-y-12">
+              {filteredInsights.map((article, index) => (
               <article
                 key={article.id}
                 className="pb-12 border-b border-foreground/10 last:border-b-0 last:pb-0 animate-fadeInUp"
@@ -108,10 +133,11 @@ export default function Insights() {
                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </button>
               </article>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
-          {filteredInsights.length === 0 && (
+          {!isLoading && !isError && filteredInsights.length === 0 && (
             <div className="text-center py-16">
               <p className="text-lg text-foreground/70">
                 No articles found in this category. Try a different filter.

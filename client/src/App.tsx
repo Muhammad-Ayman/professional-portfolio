@@ -11,6 +11,7 @@ import About from "./pages/About";
 import Portfolio from "./pages/Portfolio";
 import Insights from "./pages/Insights";
 import Contact from "./pages/Contact";
+import CMS from "./pages/CMS";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path={"/portfolio"} component={Portfolio} />
       <Route path={"/insights"} component={Insights} />
       <Route path={"/contact"} component={Contact} />
+      <Route path={"/cms"} component={CMS} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

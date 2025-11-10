@@ -1,208 +1,195 @@
-# Professional Portfolio Website
+# Professional Portfolio CMS
 
-A modern, elegant, and SEO-friendly portfolio website built with React, Tailwind CSS, and best practices for web development.
+This project is a React 19 portfolio front-end backed by an Express API that powers a lightweight CMS. All portfolio content (profile, case studies, and insights) is stored as JSON and can be managed through secure HTTP endpoints.
 
-## Features
+## Highlights
 
-### Design & Aesthetics
-- **Dark Theme with Gold Accents**: Professional, elegant color scheme with oklch color system
-- **Responsive Design**: Fully responsive across all devices (mobile, tablet, desktop)
-- **Smooth Animations**: Custom animations (fadeInUp, slideInLeft, slideInRight, pulse-glow, shimmer)
-- **Glass Morphism Effects**: Modern UI with glass morphism and gradient backgrounds
-- **Typography**: Playfair Display for headings, Inter for body text
+- **Dynamic content** served from an Express API with file-based persistence.
+- **Secure admin endpoints** protected by a bearer token (`CMS_ADMIN_TOKEN`).
+- **React Query data layer** keeps the UI in sync with backend changes.
+- **Type-safe validation** using Zod for all incoming payloads.
+- **Vite proxy** in development so the client can call the API without CORS headaches.
 
-### Pages
-1. **Home** (`/`)
-   - Hero section with compelling headline
-   - Features showcase (Clean Code, High Performance, Beautiful Design)
-   - Featured projects grid
-   - Call-to-action sections
+## Tech Stack
 
-2. **About** (`/about`)
-   - Personal biography
-   - Professional experience timeline
-   - Skills grid organized by category
-   - Core values section
-   - Statistics showcase
-
-3. **Portfolio** (`/portfolio`)
-   - Filterable project grid (All, Web, Mobile, Full-Stack)
-   - Project cards with images, descriptions, and tags
-   - Links to live demos and GitHub repositories
-   - Hover effects and image overlays
-
-4. **Contact** (`/contact`)
-   - Contact form with validation
-   - Contact information (email, phone, location)
-   - Social media links
-   - FAQ section with collapsible items
-
-### SEO Features
-- **Meta Tags**: Comprehensive meta tags for all pages
-- **Open Graph Tags**: Social media sharing optimization
-- **Twitter Cards**: Twitter-specific meta tags
-- **Sitemap**: XML sitemap for search engines (`/sitemap.xml`)
-- **Robots.txt**: Search engine crawling rules (`/robots.txt`)
-- **Canonical URLs**: Proper canonical URL handling
-- **SEO Component**: Reusable SEOHead component for page-specific metadata
-
-### Performance
-- **Fast Load Times**: Optimized images and lazy loading
-- **Code Splitting**: Route-based code splitting with Wouter
-- **CSS Optimization**: Tailwind CSS with PurgeCSS
-- **Minimal Dependencies**: Lightweight and maintainable codebase
+- **Frontend:** React 19, Vite 7, Tailwind CSS 4, Wouter, @tanstack/react-query
+- **Backend:** Express 4, TypeScript, Zod, Node 20+
+- **Build tooling:** esbuild, pnpm, tsx
 
 ## Project Structure
 
 ```
-client/
-├── public/
-│   ├── robots.txt          # Search engine crawling rules
-│   └── sitemap.xml         # XML sitemap for SEO
-├── src/
-│   ├── components/
-│   │   ├── Layout.tsx      # Main layout with header and footer
-│   │   ├── SEOHead.tsx     # SEO meta tag management
-│   │   ├── Hero.tsx        # Reusable hero section
-│   │   ├── Section.tsx     # Reusable section wrapper
-│   │   ├── Card.tsx        # Reusable card component
-│   │   └── ui/             # shadcn/ui components
-│   ├── pages/
-│   │   ├── Home.tsx        # Home page
-│   │   ├── About.tsx       # About page
-│   │   ├── Portfolio.tsx   # Portfolio page
-│   │   ├── Contact.tsx     # Contact page
-│   │   └── NotFound.tsx    # 404 page
-│   ├── lib/
-│   │   └── seo.ts          # SEO utilities and metadata
-│   ├── App.tsx             # Main app component with routing
-│   ├── main.tsx            # React entry point
-│   └── index.css           # Global styles and animations
-├── index.html              # HTML template with SEO meta tags
-└── tailwind.config.ts      # Tailwind CSS configuration
+.
+├── client/                # React application
+│   ├── public/            # Static assets
+│   └── src/
+│       ├── api/           # Axios client + CMS API wrappers
+│       ├── components/    # UI + layout primitives
+│       ├── hooks/         # React Query hooks for content
+│       ├── lib/           # SEO helpers and utilities
+│       └── pages/         # Route components
+├── server/                # Express API
+│   ├── data/              # JSON content storage (mutable at runtime)
+│   ├── routes/            # CMS routes
+│   ├── middleware/        # Auth middleware
+│   └── contentStore.ts    # File persistence helpers
+├── shared/                # Shared TypeScript types
+├── dist/                  # Production build output
+└── PORTFOLIO_README.md    # This document
 ```
 
-## Customization Guide
+## Getting Started
 
-### 1. Update Personal Information
+### Prerequisites
 
-Edit `/client/src/lib/seo.ts`:
-```typescript
-export const siteConfig = {
-  name: "Your Name",
-  description: "Your professional description",
-  url: "https://yourdomain.com",
-  twitter: "@yourhandle",
-  author: "Your Name",
-};
-```
+- Node.js 20+
+- pnpm 10+
 
-### 2. Update Contact Information
+### Install dependencies
 
-Edit `/client/src/pages/Contact.tsx`:
-- Update email address in `contactInfo` array
-- Update phone number
-- Update location
-- Update social media links
-
-### 3. Customize Colors
-
-Edit `/client/src/index.css`:
-- Primary color: `oklch(0.75 0.15 60)` (gold)
-- Background: `oklch(0.12 0 0)` (dark)
-- Foreground: `oklch(0.98 0 0)` (light)
-
-### 4. Update Projects
-
-Edit `/client/src/pages/Portfolio.tsx`:
-- Add/remove projects from the `projects` array
-- Update project images, descriptions, and links
-- Modify categories as needed
-
-### 5. Update Experience
-
-Edit `/client/src/pages/About.tsx`:
-- Update experience timeline in `experience` array
-- Update skills in `skills` array
-- Modify statistics in `stats` array
-
-### 6. Update Navigation Links
-
-Edit `/client/src/components/Layout.tsx`:
-- Modify `navLinks` array to change navigation items
-- Update footer links and social media URLs
-
-## SEO Best Practices
-
-1. **Page Titles**: Each page has a unique, descriptive title
-2. **Meta Descriptions**: Compelling descriptions for all pages
-3. **Keywords**: Relevant keywords for each page
-4. **Open Graph**: Social media sharing with images and descriptions
-5. **Canonical URLs**: Proper canonical URL handling
-6. **Mobile Friendly**: Fully responsive design
-7. **Fast Loading**: Optimized images and code splitting
-8. **Structured Data**: Ready for schema.org integration
-
-## Performance Optimization
-
-- **Image Optimization**: Use optimized image formats (WebP, AVIF)
-- **Lazy Loading**: Images load on demand
-- **CSS Optimization**: Tailwind CSS with PurgeCSS removes unused styles
-- **Code Splitting**: Routes are code-split for faster initial load
-- **Caching**: Static assets are cached aggressively
-
-## Deployment
-
-The site is ready to deploy to any static hosting platform:
-
-- **Vercel**: Recommended for Next.js-like projects
-- **Netlify**: Great for static sites
-- **GitHub Pages**: Free hosting for static sites
-- **AWS S3 + CloudFront**: Scalable solution
-
-## Browser Support
-
-- Chrome/Edge (latest)
-- Firefox (latest)
-- Safari (latest)
-- Mobile browsers (iOS Safari, Chrome Mobile)
-
-## Technologies Used
-
-- **React 19**: UI library
-- **Tailwind CSS 4**: Utility-first CSS framework
-- **Wouter**: Lightweight routing library
-- **Lucide Icons**: Beautiful icon library
-- **shadcn/ui**: High-quality UI components
-- **TypeScript**: Type-safe development
-
-## Development
-
-### Install Dependencies
 ```bash
 pnpm install
 ```
 
-### Start Development Server
+### Environment variables
+
+Create a `.env` file in the project root:
+
+```bash
+# Required for CMS write operations
+CMS_ADMIN_TOKEN=your-secret-admin-token-here
+
+# Optional server configuration
+PORT=4000
+
+# Optional client API configuration (defaults are fine for most cases)
+# VITE_API_BASE_URL=/api
+# VITE_API_PROXY_TARGET=http://localhost:4000
+
+# Optional data directory override
+# CMS_DATA_DIR=./server/data
+```
+
+| Variable | Description | Default |
+| --- | --- | --- |
+| `CMS_ADMIN_TOKEN` | **Required** token for POST/PUT/DELETE CMS endpoints | _(none)_ |
+| `PORT` | Port for the Express server | `4000` |
+| `VITE_API_BASE_URL` | API base URL used by the client | `/api` |
+| `VITE_API_PROXY_TARGET` | Vite dev proxy target | `http://localhost:4000` |
+| `CMS_DATA_DIR` | Directory for JSON content storage | `./server/data` |
+
+### Run in development
+
+**Easiest way** - Start both client and server together in one command:
+
 ```bash
 pnpm dev
 ```
 
-### Build for Production
+This uses `concurrently` to run both the Express API server (port `4000`) and the Vite dev server (port `3000`) simultaneously with color-coded output.
+
+**Alternative** - Run separately in two terminals:
+
+```bash
+# Terminal 1
+pnpm dev:server
+
+# Terminal 2
+pnpm dev:client
+```
+
+The Vite dev server proxies `/api/*` requests to the Express server at `http://localhost:4000`, so the client can call the API without CORS issues.
+
+> **Note:** If you see `ECONNREFUSED` errors in the browser console, make sure the Express server is running.
+
+## Build & Production
+
+Create a production build of both the client and the server:
+
 ```bash
 pnpm build
 ```
 
-### Preview Production Build
+This command:
+
+1. Builds the React app into `dist/public`.
+2. Bundles the Express server into `dist/index.js`.
+
+Run the bundled server (serves static assets and the API from the same process):
+
 ```bash
-pnpm preview
+pnpm start
 ```
+
+Supply `CMS_ADMIN_TOKEN` (and `PORT`, if necessary) in the production environment.
+
+## CMS API
+
+All content lives under `/api/content`. Mutation endpoints require a bearer token that matches `CMS_ADMIN_TOKEN`.
+
+### Authentication
+
+Send an `Authorization` header with the value `Bearer <CMS_ADMIN_TOKEN>` when creating, updating, or deleting content.
+
+### Endpoints
+
+| Method | Route | Description | Auth |
+| --- | --- | --- | --- |
+| `GET` | `/api/content` | Fetch profile, case studies, and insights in one request | No |
+| `GET` | `/api/content/profile` | Fetch profile | No |
+| `PUT` | `/api/content/profile` | Replace profile details | Yes |
+| `GET` | `/api/content/case-studies` | Fetch all case studies | No |
+| `POST` | `/api/content/case-studies` | Create a case study (ID auto-generated if omitted) | Yes |
+| `PUT` | `/api/content/case-studies/:id` | Update a case study | Yes |
+| `DELETE` | `/api/content/case-studies/:id` | Delete a case study | Yes |
+| `GET` | `/api/content/insights` | Fetch all insights | No |
+| `POST` | `/api/content/insights` | Create an insight | Yes |
+| `PUT` | `/api/content/insights/:id` | Update an insight | Yes |
+| `DELETE` | `/api/content/insights/:id` | Delete an insight | Yes |
+
+### Example request
+
+```bash
+curl -X POST http://localhost:4000/api/content/case-studies \
+  -H "Authorization: Bearer $CMS_ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "New Engagement",
+    "client": "Acme Corp",
+    "sector": "Enterprise Technology",
+    "contractValue": "$5M",
+    "outcome": "Won",
+    "description": "Summary of the win...",
+    "keyAchievements": ["Reduced delivery time by 30%"],
+    "image": "https://example.com/image.jpg",
+    "featured": true
+  }'
+```
+
+### Storage
+
+- Content is persisted under `server/data/*.json`.
+- The server automatically reads from the existing files; no database is required.
+- You can point to a different data directory by setting `CMS_DATA_DIR`.
+
+## Frontend data layer
+
+- `client/src/api` contains Axios-based helpers for the CMS endpoints.
+- `client/src/hooks/useContent.ts` exposes `useProfile`, `useCaseStudies`, and `useInsights`, powered by React Query.
+- Pages consume these hooks and render loading and error states gracefully.
+
+## Updating content manually
+
+You can edit the JSON files under `server/data` directly while the server is stopped. The next server start will pick up the changes.
+
+## Troubleshooting
+
+- **401 / 403 errors on write requests** — ensure `CMS_ADMIN_TOKEN` is set on the server and that your request includes a matching bearer token.
+- **404 when updating/deleting** — confirm the ID exists. Use `GET /api/content/<collection>` to list the current items.
+- **Dev server cannot reach API** — make sure `pnpm dev:server` is running on port `4000`. Override `VITE_API_PROXY_TARGET` if your API uses a different port.
+- **TypeScript complaints about JSON imports** — the project does not import JSON directly; edit the data files or interact through the API instead.
 
 ## License
 
-This project is open source and available under the MIT License.
-
-## Support
-
-For questions or issues, please refer to the documentation or create an issue in the repository.
+MIT
 
