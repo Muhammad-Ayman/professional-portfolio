@@ -164,14 +164,16 @@ export default function Home() {
                   <p className="text-foreground/70 mb-4">{caseStudy.description}</p>
 
                   {/* Key Achievements */}
-                  <div className="mb-6 space-y-2">
-                    {caseStudy.keyAchievements.slice(0, 2).map((achievement, i) => (
-                      <div key={i} className="flex items-start gap-3">
-                        <div className="w-1 h-1 bg-primary rounded-full mt-2 flex-shrink-0"></div>
-                        <p className="text-sm text-foreground/70">{achievement}</p>
-                      </div>
-                    ))}
-                  </div>
+                  {caseStudy.keyAchievements && caseStudy.keyAchievements.filter(a => a.trim()).length > 0 && (
+                    <div className="mb-6 space-y-2">
+                      {caseStudy.keyAchievements.filter(a => a.trim()).slice(0, 2).map((achievement, i) => (
+                        <div key={i} className="flex items-start gap-3">
+                          <div className="w-1 h-1 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                          <p className="text-sm text-foreground/70">{achievement}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Stats */}
                   <div className="grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-foreground/10">
@@ -180,8 +182,8 @@ export default function Home() {
                       <p className="text-xl font-bold text-primary">{caseStudy.contractValue}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-foreground/50 uppercase tracking-wide">Outcome</p>
-                      <p className="text-sm font-semibold text-foreground">{caseStudy.outcome}</p>
+                      <p className="text-xs text-foreground/50 uppercase tracking-wide">Country</p>
+                      <p className="text-sm font-semibold text-foreground">{caseStudy.country}</p>
                     </div>
                   </div>
 

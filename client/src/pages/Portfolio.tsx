@@ -125,19 +125,21 @@ export default function Portfolio() {
                   </p>
 
                   {/* Key Achievements */}
-                  <div className="mb-8">
-                    <p className="text-sm font-semibold uppercase tracking-wide text-foreground/60 mb-4">
-                      Key Achievements
-                    </p>
-                    <div className="space-y-3">
-                      {caseStudy.keyAchievements.map((achievement, i) => (
-                        <div key={i} className="flex items-start gap-3">
-                          <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
-                          <p className="text-foreground/80">{achievement}</p>
-                        </div>
-                      ))}
+                  {caseStudy.keyAchievements && caseStudy.keyAchievements.filter(a => a.trim()).length > 0 && (
+                    <div className="mb-8">
+                      <p className="text-sm font-semibold uppercase tracking-wide text-foreground/60 mb-4">
+                        Key Achievements
+                      </p>
+                      <div className="space-y-3">
+                        {caseStudy.keyAchievements.filter(a => a.trim()).map((achievement, i) => (
+                          <div key={i} className="flex items-start gap-3">
+                            <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                            <p className="text-foreground/80">{achievement}</p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Stats */}
                   <div className="grid grid-cols-2 gap-6 mb-8 pb-8 border-b border-foreground/10">
@@ -151,10 +153,10 @@ export default function Portfolio() {
                     </div>
                     <div>
                       <p className="text-xs text-foreground/50 uppercase tracking-widest font-semibold">
-                        Outcome
+                        Country
                       </p>
                       <p className="text-lg font-semibold text-foreground mt-2">
-                        {caseStudy.outcome}
+                        {caseStudy.country}
                       </p>
                     </div>
                   </div>

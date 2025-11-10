@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus, Save, X } from "lucide-react";
+import ImageUpload from "@/components/ImageUpload";
 import type { Profile, CaseStudy, Insight } from "@shared/content";
 
 export default function CMS() {
@@ -77,7 +78,7 @@ export default function CMS() {
       client: "",
       sector: "",
       contractValue: "",
-      outcome: "",
+      country: "",
       description: "",
       keyAchievements: [""],
       image: "",
@@ -88,16 +89,24 @@ export default function CMS() {
   const handleSaveCaseStudy = async () => {
     if (!editingCaseStudy) return;
     try {
-      if (editingCaseStudy.id) {
-        await apiCall(`/api/content/case-studies/${editingCaseStudy.id}`, {
+      // Filter out empty achievements
+      const cleanedCaseStudy = {
+        ...editingCaseStudy,
+        keyAchievements: editingCaseStudy.keyAchievements.filter(a => a.trim() !== "")
+      };
+      
+      if (cleanedCaseStudy.id) {
+        await apiCall(`/api/content/case-studies/${cleanedCaseStudy.id}`, {
           method: "PUT",
-          body: JSON.stringify(editingCaseStudy),
+          body: JSON.stringify(cleanedCaseStudy),
         });
         toast.success("Case study updated");
       } else {
+        // Remove empty id field for new case studies
+        const { id, ...caseStudyData } = cleanedCaseStudy;
         await apiCall("/api/content/case-studies", {
           method: "POST",
-          body: JSON.stringify(editingCaseStudy),
+          body: JSON.stringify(caseStudyData),
         });
         toast.success("Case study created");
       }
@@ -143,9 +152,11 @@ export default function CMS() {
         });
         toast.success("Insight updated");
       } else {
+        // Remove empty id field for new insights
+        const { id, ...insightData } = editingInsight;
         await apiCall("/api/content/insights", {
           method: "POST",
-          body: JSON.stringify(editingInsight),
+          body: JSON.stringify(insightData),
         });
         toast.success("Insight created");
       }
@@ -392,12 +403,12 @@ export default function CMS() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-2">Outcome</label>
+                    <label className="block text-sm font-semibold mb-2">Country</label>
                     <input
                       type="text"
-                      value={editingCaseStudy.outcome}
-                      onChange={(e) => setEditingCaseStudy({ ...editingCaseStudy, outcome: e.target.value })}
-                      placeholder="e.g., Won - Highest rated"
+                      value={editingCaseStudy.country}
+                      onChange={(e) => setEditingCaseStudy({ ...editingCaseStudy, country: e.target.value })}
+                      placeholder="e.g., USA"
                       className="w-full px-4 py-2 bg-background border border-foreground/20 rounded-lg"
                     />
                   </div>
@@ -411,7 +422,59 @@ export default function CMS() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-2">Image URL</label>
+                    <label className="block text-sm font-semibold mb-2">Key Achievements</label>
+                    <div className="space-y-2">
+                      {editingCaseStudy.keyAchievements.map((achievement, index) => (
+                        <div key={index} className="flex gap-2">
+                          <input
+                            type="text"
+                            value={achievement}
+                            onChange={(e) => {
+                              const newAchievements = [...editingCaseStudy.keyAchievements];
+                              newAchievements[index] = e.target.value;
+                              setEditingCaseStudy({ ...editingCaseStudy, keyAchievements: newAchievements });
+                            }}
+                            placeholder={`Achievement ${index + 1}`}
+                            className="flex-1 px-4 py-2 bg-background border border-foreground/20 rounded-lg"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const newAchievements = editingCaseStudy.keyAchievements.filter((_, i) => i !== index);
+                              setEditingCaseStudy({ ...editingCaseStudy, keyAchievements: newAchievements });
+                            }}
+                          >
+                            <X className="size-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setEditingCaseStudy({
+                            ...editingCaseStudy,
+                            keyAchievements: [...editingCaseStudy.keyAchievements, ""]
+                          });
+                        }}
+                      >
+                        <Plus className="size-4 mr-2" />
+                        Add Achievement
+                      </Button>
+                    </div>
+                  </div>
+                  <ImageUpload
+                    currentImage={editingCaseStudy.image}
+                    onImageChange={(url) => setEditingCaseStudy({ ...editingCaseStudy, image: url })}
+                    onImageRemove={() => setEditingCaseStudy({ ...editingCaseStudy, image: "" })}
+                    token={token}
+                    label="Case Study Image"
+                  />
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">Or enter image URL manually</label>
                     <input
                       type="url"
                       value={editingCaseStudy.image}

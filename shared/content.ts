@@ -29,7 +29,7 @@ export interface CaseStudy {
   client: string;
   sector: string;
   contractValue: string;
-  outcome: string;
+  country: string;
   description: string;
   keyAchievements: string[];
   image: string;

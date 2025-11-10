@@ -172,6 +172,76 @@ curl -X POST http://localhost:4000/api/content/case-studies \
 - The server automatically reads from the existing files; no database is required.
 - You can point to a different data directory by setting `CMS_DATA_DIR`.
 
+## Image Uploads
+
+The CMS supports uploading images from any computer to **cloud storage** (recommended) or local filesystem.
+
+### Cloud Storage Setup (Recommended)
+
+Images are uploaded from your browser to cloud storage, accessible from anywhere:
+
+**Option A: ImgBB (Easiest - Free, No Credit Card)**
+1. Sign up at [https://imgbb.com/](https://imgbb.com/)
+2. Get your API key from [https://api.imgbb.com/](https://api.imgbb.com/)
+3. Add to `.env`:
+   ```bash
+   IMGBB_API_KEY=your_imgbb_api_key_here
+   ```
+
+**Option B: Cloudinary (Free Tier Available)**
+1. Sign up at [https://cloudinary.com/](https://cloudinary.com/)
+2. Go to Settings → Upload → Upload presets
+3. Click "Add upload preset"
+4. Set **Signing mode** to **"Unsigned"** (IMPORTANT!)
+5. Give it a name like `portfolio_uploads`
+6. Save the preset
+7. Add to `.env`:
+   ```bash
+   CLOUDINARY_CLOUD_NAME=your_cloud_name
+   CLOUDINARY_UPLOAD_PRESET=portfolio_uploads
+   ```
+   
+   **Note:** You only need these 2 variables! (API_KEY and API_SECRET are not needed for unsigned uploads)
+
+**Option C: Manual URLs**
+- Just paste any external image URL
+- Works with Unsplash, AWS S3, any CDN
+
+### How It Works
+
+1. **Upload from anywhere:** Access CMS at `http://your-server.com/cms`
+2. **Select image:** Choose from your local computer (any PC in the world)
+3. **Automatic upload:** Image uploads to ImgBB/Cloudinary/your server
+4. **Returns full URL:** `https://i.ibb.co/abc123/image.jpg` or similar
+5. **Works everywhere:** Images are publicly accessible via CDN
+
+### Upload API
+
+**Endpoint:** `POST /api/upload` (requires admin token)
+
+**Request:**
+```json
+{
+  "image": "data:image/png;base64,iVBORw0KG...",
+  "filename": "my-image.png"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "url": "/uploads/my-image-abc123.png",
+  "filename": "my-image-abc123.png"
+}
+```
+
+### Production Notes
+
+For production deployments, consider:
+- Use cloud storage (Cloudinary, AWS S3) for better reliability
+- Or ensure `/dist/public/uploads/` is backed up and persisted across deployments
+
 ## Frontend data layer
 
 - `client/src/api` contains Axios-based helpers for the CMS endpoints.
