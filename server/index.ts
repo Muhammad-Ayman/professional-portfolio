@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import contentRouter from "./routes/content";
 import uploadRouter from "./routes/upload";
+import emailRouter from "./routes/email";
 import { getAdminToken, updateAdminToken } from "./contentStore";
 
 dotenv.config();
@@ -41,6 +42,7 @@ async function startServer() {
 
   app.use("/api/content", contentRouter);
   app.use("/api/upload", uploadRouter);
+  app.use("/api/email", emailRouter);
 
   // Serve static files from dist/public in production
   const staticPath =

@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Linkedin } from "lucide-react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -25,7 +25,7 @@ export default function Layout({ children }: LayoutProps) {
         <nav className="container flex items-center justify-between py-4">
           {/* Logo */}
           <Link href="/" className="text-2xl font-display font-bold text-gradient hover:opacity-80 transition-opacity">
-            Portfolio
+          Mohamed Merza
           </Link>
 
           {/* Desktop Navigation */}
@@ -83,22 +83,22 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Footer */}
       <footer className="border-t border-border bg-background/50 backdrop-blur-sm">
-        <div className="container py-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div className="container py-16">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-12">
             {/* Brand */}
-            <div>
-              <h3 className="text-lg font-display font-bold text-gradient mb-2">
-                Portfolio
+            <div className="md:col-span-4">
+              <h3 className="text-2xl font-display font-bold text-gradient mb-4">
+                Mohamed Merza
               </h3>
-              <p className="text-sm text-muted-foreground">
-                Professional portfolio website built with Next.js and Tailwind CSS.
+              <p className="text-sm text-muted-foreground max-w-xs">
+                Proposal Strategy Expert | Leadership Consultant | Business Development Professional
               </p>
             </div>
 
             {/* Quick Links */}
-            <div>
-              <h4 className="text-sm font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-sm">
+            <div className="md:col-span-4">
+              <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Quick Links</h4>
+              <ul className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
                 {navLinks.map((link) => (
                   <li key={link.href}>
                     <Link href={link.href} className="text-muted-foreground hover:text-primary transition-colors">
@@ -110,37 +110,18 @@ export default function Layout({ children }: LayoutProps) {
             </div>
 
             {/* Social Links */}
-            <div>
-              <h4 className="text-sm font-semibold mb-4">Connect</h4>
-              <ul className="space-y-2 text-sm">
+            <div className="md:col-span-4">
+              <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Connect</h4>
+              <ul className="space-y-3 text-sm">
                 <li>
                   <a
-                    href="https://twitter.com"
+                    href="https://www.linkedin.com/in/mohamedsalahmerza/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-2 group"
                   >
-                    Twitter
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://linkedin.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
+                    <Linkedin size={18} className="group-hover:scale-110 transition-transform" />
                     LinkedIn
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://github.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    GitHub
                   </a>
                 </li>
               </ul>
@@ -150,7 +131,7 @@ export default function Layout({ children }: LayoutProps) {
           {/* Copyright */}
           <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
             <p>
-              &copy; {new Date().getFullYear()} Your Name. All rights reserved.
+              &copy; {new Date().getFullYear()} Mohamed Merza. All rights reserved.
             </p>
           </div>
         </div>

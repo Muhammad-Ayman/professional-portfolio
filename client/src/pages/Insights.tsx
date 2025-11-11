@@ -11,9 +11,58 @@ import LottieAnimation from "@/components/LottieAnimation";
 
 export default function Insights() {
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [subscribeSuccess, setSubscribeSuccess] = useState(false);
+  const [subscribeError, setSubscribeError] = useState<string | null>(null);
   const { data: insights, isLoading, isError } = useInsights();
   const { data: profile } = useProfile();
   const pageMetadata = buildPageSEO(profile).insights;
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubscribing(true);
+    setSubscribeError(null);
+
+    try {
+      const response = await fetch("/api/email/newsletter", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: newsletterEmail }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle validation errors with detailed messages
+        if (data.details?.fieldErrors) {
+          const fieldErrors = data.details.fieldErrors;
+          const errorMessages: string[] = [];
+          
+          // Collect all field error messages
+          if (fieldErrors.email?.length) errorMessages.push(...fieldErrors.email);
+          
+          throw new Error(errorMessages.join(". ") || data.error);
+        }
+        
+        throw new Error(data.error || "Failed to subscribe");
+      }
+
+      setSubscribeSuccess(true);
+      setNewsletterEmail("");
+      
+      // Reset success message after 5 seconds
+      setTimeout(() => {
+        setSubscribeSuccess(false);
+      }, 5000);
+    } catch (err) {
+      setSubscribeError(err instanceof Error ? err.message : "Failed to subscribe. Please try again.");
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
 
   const categories = ["all", ...(insights ? Array.from(new Set(insights.map((i) => i.category))) : [])];
   const filteredInsights =
@@ -175,16 +224,53 @@ export default function Insights() {
           <p className="text-lg text-foreground/70 mb-8">
             Subscribe to receive new insights on proposal strategy and leadership directly in your inbox.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-4 py-3 bg-background border border-foreground/20 rounded-lg text-foreground placeholder-foreground/50 focus:outline-none focus:border-primary transition-colors"
-            />
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 font-semibold">
-              Subscribe
-            </Button>
-          </div>
+          {subscribeSuccess ? (
+            <div className="max-w-md mx-auto bg-primary/10 border border-primary/30 rounded-lg p-6 text-center">
+              <div className="w-20 h-20 mx-auto mb-4">
+                <LottieAnimation src="https://assets10.lottiefiles.com/packages/lf20_touohxv0.json" loop={false} speed={0.2} />
+              </div>
+              <h3 className="text-lg font-semibold text-primary mb-2">Successfully Subscribed!</h3>
+              <p className="text-sm text-foreground/70">
+                Check your email for confirmation.
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleNewsletterSubmit} className="max-w-md mx-auto">
+              {subscribeError && (
+                <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-sm">
+                  {subscribeError}
+                </div>
+              )}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={newsletterEmail}
+                  onChange={(e) => {
+                    setNewsletterEmail(e.target.value);
+                    if (subscribeError) setSubscribeError(null);
+                  }}
+                  required
+                  disabled={isSubscribing}
+                  className="flex-1 px-4 py-3 bg-background border border-foreground/20 rounded-lg text-foreground placeholder-foreground/50 focus:outline-none focus:border-primary transition-colors disabled:opacity-50"
+                />
+                <Button 
+                  type="submit"
+                  disabled={isSubscribing}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubscribing ? (
+                    <>
+                      <Spinner className="mr-2 size-4" />
+                      Subscribing...
+                    </>
+                  ) : (
+                    "Subscribe"
+                  )}
+                </Button>
+              </div>
+            </form>
+          )}
         </div>
       </section>
     </div>

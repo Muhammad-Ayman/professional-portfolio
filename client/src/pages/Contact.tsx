@@ -16,6 +16,8 @@ export default function Contact() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { data: profile, isLoading, isError } = useProfile();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -24,17 +26,55 @@ export default function Contact() {
       ...prev,
       [name]: value,
     }));
+    // Clear error when user starts typing
+    if (error) setError(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted:", formData);
-    setSubmitted(true);
-    setTimeout(() => {
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/email/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle validation errors with detailed messages
+        if (data.details?.fieldErrors) {
+          const fieldErrors = data.details.fieldErrors;
+          const errorMessages: string[] = [];
+          
+          // Collect all field error messages
+          if (fieldErrors.name?.length) errorMessages.push(...fieldErrors.name);
+          if (fieldErrors.email?.length) errorMessages.push(...fieldErrors.email);
+          if (fieldErrors.message?.length) errorMessages.push(...fieldErrors.message);
+          
+          throw new Error(errorMessages.join(". ") || data.error);
+        }
+        
+        throw new Error(data.error || "Failed to send message");
+      }
+
+      setSubmitted(true);
       setFormData({ name: "", email: "", message: "" });
-      setSubmitted(false);
-    }, 3000);
+      
+      // Reset success message after 5 seconds
+      setTimeout(() => {
+        setSubmitted(false);
+      }, 5000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isLoading) {
@@ -152,11 +192,16 @@ export default function Contact() {
                   </div>
                   <h3 className="text-xl font-semibold text-primary mb-2">Thank You!</h3>
                   <p className="text-foreground/70">
-                    Your message has been received. I'll get back to you soon.
+                    Your message has been sent successfully. I'll get back to you soon.
                   </p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {error && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-sm">
+                      <strong>Error:</strong> {error}
+                    </div>
+                  )}
                   {/* Name */}
                   <div>
                     <label htmlFor="name" className="block text-sm font-semibold mb-2">
@@ -170,7 +215,7 @@ export default function Contact() {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 bg-background border border-foreground/20 rounded-lg text-foreground placeholder-foreground/50 focus:outline-none focus:border-primary transition-colors"
-                      placeholder="Your name"
+                      placeholder="Mohamed Merza"
                     />
                   </div>
 
@@ -211,10 +256,20 @@ export default function Contact() {
                   {/* Submit Button */}
                   <Button
                     type="submit"
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 font-semibold group"
+                    disabled={isSubmitting}
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 font-semibold group disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Send Message
-                    <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+                    {isSubmitting ? (
+                      <>
+                        <Spinner className="mr-2 size-5" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        Send Message
+                        <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+                      </>
+                    )}
                   </Button>
                 </form>
               )}
