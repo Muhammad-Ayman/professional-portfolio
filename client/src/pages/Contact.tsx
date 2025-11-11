@@ -5,6 +5,8 @@ import SEOHead from "@/components/SEOHead";
 import { buildPageSEO } from "@/lib/seo";
 import { Spinner } from "@/components/ui/spinner";
 import { useProfile } from "@/hooks/useContent";
+import LottieAnimation from "@/components/LottieAnimation";
+// animations loaded via CDN URLs using LottieAnimation `src`
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -67,6 +69,13 @@ export default function Contact() {
       <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-20">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/50"></div>
         <div className="absolute top-20 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+
+        {/* Email - Client Communication */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-48 h-48 md:w-56 md:h-56 opacity-30 pointer-events-none float-slow-animation">
+          <LottieAnimation src="https://assets7.lottiefiles.com/packages/lf20_8wREpI.json" speed={0.2} />
+        </div>
+
+        
 
         <div className="container relative z-10 max-w-4xl mx-auto px-4">
           <div className="text-center animate-fadeInUp">
@@ -138,6 +147,9 @@ export default function Contact() {
 
               {submitted ? (
                 <div className="bg-primary/10 border border-primary/30 rounded-lg p-8 text-center">
+                  <div className="w-32 h-32 mx-auto mb-4">
+                    <LottieAnimation src="https://assets10.lottiefiles.com/packages/lf20_touohxv0.json" loop={false} speed={0.2} />
+                  </div>
                   <h3 className="text-xl font-semibold text-primary mb-2">Thank You!</h3>
                   <p className="text-foreground/70">
                     Your message has been received. I'll get back to you soon.

@@ -6,6 +6,8 @@ import SEOHead from "@/components/SEOHead";
 import { buildPageSEO } from "@/lib/seo";
 import { Spinner } from "@/components/ui/spinner";
 import { useInsights, useProfile } from "@/hooks/useContent";
+import LottieAnimation from "@/components/LottieAnimation";
+// animations loaded via CDN URLs using LottieAnimation `src`
 
 export default function Insights() {
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -27,6 +29,21 @@ export default function Insights() {
       <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-20">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/50"></div>
         <div className="absolute top-20 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+
+        {/* Analytics Chart - Strategic Insights */}
+        <div className="absolute top-24 right-12 w-40 h-40 md:w-52 md:h-52 opacity-30 pointer-events-none float-slow-animation">
+          <LottieAnimation src="https://assets4.lottiefiles.com/packages/lf20_qp1q7mct.json" speed={0.6} />
+        </div>
+
+        {/* Writing Document - Content Creation */}
+        <div className="absolute top-24 left-12 w-32 h-32 md:w-40 md:h-40 opacity-25 pointer-events-none float-animation">
+          <LottieAnimation src="https://assets1.lottiefiles.com/packages/lf20_1pxqjqps.json" speed={0.6} />
+        </div>
+
+        {/* Target Goal - Performance Tracking */}
+        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-36 h-36 md:w-48 md:h-48 opacity-25 pointer-events-none float-slow-animation">
+          <LottieAnimation src="https://assets1.lottiefiles.com/packages/lf20_u4yrau.json" speed={0.6} />
+        </div>
 
         <div className="container relative z-10 max-w-4xl mx-auto px-4">
           <div className="text-center animate-fadeInUp">

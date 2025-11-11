@@ -6,6 +6,7 @@ import { buildPageSEO } from "@/lib/seo";
 import { Spinner } from "@/components/ui/spinner";
 import { useProfile } from "@/hooks/useContent";
 import HoverImage from "@/components/HoverImage";
+import LottieAnimation from "@/components/LottieAnimation";
 
 export default function About() {
   const { data: profile, isLoading, isError } = useProfile();
@@ -42,6 +43,13 @@ export default function About() {
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/50"></div>
         <div className="absolute top-20 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+
+        
+
+        {/* Analytics - Strategic Program Design */}
+        <div className="absolute bottom-24 right-12 w-28 h-28 md:w-36 md:h-36 opacity-30 pointer-events-none float-slow-animation">
+          <LottieAnimation src="https://assets4.lottiefiles.com/packages/lf20_qp1q7mct.json" speed={0.6} />
+        </div>
 
         <div className="container relative z-10 max-w-4xl mx-auto px-4">
           <div className="text-center animate-fadeInUp">
@@ -92,8 +100,13 @@ export default function About() {
       </section>
 
       {/* Mission & Philosophy */}
-      <section className="section-padding bg-foreground/2">
-        <div className="container max-w-6xl">
+      <section className="section-padding bg-foreground/2 relative overflow-hidden">
+        {/* Target - Mission Objectives & RFP Focus */}
+        <div className="absolute bottom-12 left-12 w-36 h-36 md:w-48 md:h-48 opacity-25 pointer-events-none float-animation">
+          <LottieAnimation src="https://assets1.lottiefiles.com/packages/lf20_u4yrau.json" speed={0.6} />
+        </div>
+
+        <div className="container max-w-6xl relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* Mission */}
             <div className="animate-fadeInUp">
@@ -123,8 +136,10 @@ export default function About() {
       </section>
 
       {/* Sectors & Regions */}
-      <section className="section-padding">
-        <div className="container max-w-6xl">
+      <section className="section-padding relative overflow-hidden">
+   
+
+        <div className="container max-w-6xl relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* Sectors */}
             <div className="animate-fadeInUp">

@@ -6,6 +6,7 @@ import { buildPageSEO } from "@/lib/seo";
 import { Spinner } from "@/components/ui/spinner";
 import { useCaseStudies, useProfile } from "@/hooks/useContent";
 import HoverImage from "@/components/HoverImage";
+import LottieAnimation from "@/components/LottieAnimation";
 
 export default function Home() {
   const { data: profile, isLoading: isProfileLoading, isError: isProfileError } = useProfile();
@@ -50,6 +51,13 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/50"></div>
         <div className="absolute top-20 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/3 rounded-full blur-3xl"></div>
+
+       
+
+        {/* Document Review - Compliance & Quality */}
+        <div className="absolute bottom-32 left-8 w-28 h-28 md:w-40 md:h-40 opacity-35 pointer-events-none float-slow-animation">
+          <LottieAnimation src="https://assets9.lottiefiles.com/packages/lf20_gkgqj2yq.json" speed={0.6} />
+        </div>
 
         <div className="container relative z-10 max-w-4xl mx-auto px-4">
           <div className="text-center animate-fadeInUp">
@@ -112,6 +120,11 @@ export default function Home() {
               </Link>
             </div>
           </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-12 h-12 opacity-50 pointer-events-none">
+          <LottieAnimation src="https://assets3.lottiefiles.com/packages/lf20_uu0x8lqv.json" speed={0.6} />
         </div>
       </section>
 
@@ -205,8 +218,23 @@ export default function Home() {
       </section>
 
       {/* Expertise Section */}
-      <section className="section-padding">
-        <div className="container max-w-6xl">
+      <section className="section-padding relative overflow-hidden">
+        {/* Target Goal - RFP Requirements */}
+        <div className="absolute top-16 left-8 w-40 h-40 md:w-56 md:h-56 opacity-30 pointer-events-none float-animation">
+          <LottieAnimation src="https://assets1.lottiefiles.com/packages/lf20_u4yrau.json" speed={0.6} />
+        </div>
+
+        {/* Document Writing - Proposal Development */}
+        <div className="absolute top-1/2 right-8 w-36 h-36 md:w-48 md:h-48 opacity-25 pointer-events-none float-slow-animation">
+          <LottieAnimation src="https://assets1.lottiefiles.com/packages/lf20_1pxqjqps.json" speed={0.6} />
+        </div>
+
+        {/* Team Collaboration - Stakeholder Coordination */}
+        <div className="absolute bottom-8 left-1/4 w-40 h-40 md:w-52 md:h-52 opacity-25 pointer-events-none float-animation">
+          <LottieAnimation src="https://assets2.lottiefiles.com/packages/lf20_myejiggj.json" speed={0.6} />
+        </div>
+
+        <div className="container max-w-6xl relative z-10">
           <div className="mb-16">
             <h2 className="text-4xl md:text-5xl font-display font-bold mb-4">
               Areas of Expertise
@@ -266,8 +294,13 @@ export default function Home() {
       </section>
 
       {/* Insights Preview */}
-      <section className="section-padding bg-foreground/2">
-        <div className="container max-w-6xl">
+      <section className="section-padding bg-foreground/2 relative overflow-hidden">
+        {/* Analytics Chart - Bid Strategy & Data */}
+        <div className="absolute top-16 right-12 w-40 h-40 md:w-56 md:h-56 opacity-25 pointer-events-none float-slow-animation">
+          <LottieAnimation src="https://assets4.lottiefiles.com/packages/lf20_qp1q7mct.json" speed={0.6} />
+        </div>
+
+        <div className="container max-w-6xl relative z-10">
           <div className="mb-16">
             <h2 className="text-4xl md:text-5xl font-display font-bold mb-4">
               Latest Insights
@@ -332,9 +365,15 @@ export default function Home() {
       {/* CTA Section */}
       <section className="section-padding relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent"></div>
+        
+        {/* Team Partnership - Collaboration & Winning Bids */}
+        <div className="absolute top-1/2 -translate-y-1/2 right-12 w-48 h-48 md:w-64 md:h-64 opacity-20 pointer-events-none float-animation">
+          <LottieAnimation src="https://assets2.lottiefiles.com/packages/lf20_myejiggj.json" speed={0.6} />
+        </div>
+
         <div className="container relative z-10 max-w-3xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-display font-bold mb-6">
-          Let’s Turn Your Next Bid into a Win.
+          Let's Turn Your Next Bid into a Win.
           </h2>
           <p className="text-lg text-foreground/70 mb-8">
           From strategy to submission, I partner with teams to deliver proposals that score higher and secure funding.

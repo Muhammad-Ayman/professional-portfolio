@@ -7,6 +7,8 @@ import { buildPageSEO } from "@/lib/seo";
 import { Spinner } from "@/components/ui/spinner";
 import { useCaseStudies, useProfile } from "@/hooks/useContent";
 import HoverImage from "@/components/HoverImage";
+import LottieAnimation from "@/components/LottieAnimation";
+// animations now loaded via CDN URLs using the LottieAnimation `src` prop
 
 export default function Portfolio() {
   const [selectedSector, setSelectedSector] = useState("all");
@@ -29,6 +31,21 @@ export default function Portfolio() {
       <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-20">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/50"></div>
         <div className="absolute top-20 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+
+        {/* Portfolio Folder - Case Studies */}
+        <div className="absolute top-28 left-8 w-40 h-40 md:w-48 md:h-48 opacity-30 pointer-events-none float-animation">
+          <LottieAnimation src="https://assets6.lottiefiles.com/packages/lf20_DMgKk1.json" speed={0.6} />
+        </div>
+
+        {/* Success Checkmark - Winning Proposals */}
+        <div className="absolute top-28 right-8 w-32 h-32 md:w-44 md:h-44 opacity-30 pointer-events-none float-slow-animation">
+          <LottieAnimation src="https://assets10.lottiefiles.com/packages/lf20_touohxv0.json" speed={0.6} />
+        </div>
+
+        {/* Document Check - Quality Standards */}
+        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-36 h-36 md:w-48 md:h-48 opacity-25 pointer-events-none float-animation">
+          <LottieAnimation src="https://assets9.lottiefiles.com/packages/lf20_gkgqj2yq.json" speed={0.6} />
+        </div>
 
         <div className="container relative z-10 max-w-4xl mx-auto px-4">
           <div className="text-center animate-fadeInUp">
