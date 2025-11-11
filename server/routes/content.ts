@@ -1,21 +1,25 @@
 import { Router } from "express";
 import {
   createCaseStudy,
+  createFAQ,
   createInsight,
   deleteCaseStudy,
+  deleteFAQ,
   deleteInsight,
   getAllContent,
   getAdminToken,
   getCaseStudies,
+  getFAQs,
   getInsights,
   getProfile,
   updateAdminToken,
   updateCaseStudy,
+  updateFAQ,
   updateInsight,
   updateProfile,
 } from "../contentStore";
-import { CaseStudy, Insight, Profile } from "../../shared/content";
-import { caseStudySchema, insightSchema, profileSchema } from "../validation";
+import { CaseStudy, FAQ, Insight, Profile } from "../../shared/content";
+import { caseStudySchema, faqSchema, insightSchema, profileSchema } from "../validation";
 import { parseValidation } from "../utils/validation";
 import { requireAdminToken, invalidateTokenCache } from "../middleware/auth";
 
@@ -162,6 +166,44 @@ contentRouter.put("/insights/:id", requireAdminToken, async (req, res, next) => 
 contentRouter.delete("/insights/:id", requireAdminToken, async (req, res, next) => {
   try {
     await deleteInsight(req.params.id);
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+});
+
+contentRouter.get("/faqs", async (_req, res, next) => {
+  try {
+    const faqs = await getFAQs();
+    res.json(faqs);
+  } catch (error) {
+    next(error);
+  }
+});
+
+contentRouter.post("/faqs", requireAdminToken, async (req, res, next) => {
+  try {
+    const payload = parseValidation(faqSchema, req.body) as FAQ;
+    const created = await createFAQ(payload);
+    res.status(201).json(created);
+  } catch (error) {
+    next(error);
+  }
+});
+
+contentRouter.put("/faqs/:id", requireAdminToken, async (req, res, next) => {
+  try {
+    const payload = parseValidation(faqSchema.partial(), req.body) as Partial<FAQ>;
+    const updated = await updateFAQ(req.params.id, payload);
+    res.json(updated);
+  } catch (error) {
+    next(error);
+  }
+});
+
+contentRouter.delete("/faqs/:id", requireAdminToken, async (req, res, next) => {
+  try {
+    await deleteFAQ(req.params.id);
     res.status(204).send();
   } catch (error) {
     next(error);

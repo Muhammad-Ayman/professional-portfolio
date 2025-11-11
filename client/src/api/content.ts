@@ -1,5 +1,5 @@
 import apiClient from "./http";
-import type { CaseStudy, ContentData, Insight, Profile } from "@shared/content";
+import type { CaseStudy, ContentData, FAQ, Insight, Profile } from "@shared/content";
 
 export async function fetchContent() {
   const { data } = await apiClient.get<ContentData>("/content");
@@ -18,6 +18,11 @@ export async function fetchCaseStudies() {
 
 export async function fetchInsights() {
   const { data } = await apiClient.get<Insight[]>("/content/insights");
+  return data;
+}
+
+export async function fetchFAQs() {
+  const { data } = await apiClient.get<FAQ[]>("/content/faqs");
   return data;
 }
 

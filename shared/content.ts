@@ -49,9 +49,17 @@ export interface Insight {
   featured: boolean;
 }
 
+export interface FAQ {
+  id: string;
+  question: string;
+  answer: string;
+  order?: number | null;
+}
+
 export interface ContentData {
   profile: Profile;
   caseStudies: CaseStudy[];
   insights: Insight[];
+  faqs: FAQ[];
 }
 

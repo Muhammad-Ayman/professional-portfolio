@@ -65,7 +65,19 @@ export const insightSchema = z
   })
   .strict();
 
+export const faqSchema = z
+  .object({
+    id: z.string().min(1).optional(),
+    question: z.string().min(1),
+    answer: z.string().min(1),
+    order: z.number().nullable().optional(),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional(),
+  })
+  .strict();
+
 export type ProfilePayload = z.infer<typeof profileSchema>;
 export type CaseStudyPayload = z.infer<typeof caseStudySchema>;
 export type InsightPayload = z.infer<typeof insightSchema>;
+export type FAQPayload = z.infer<typeof faqSchema>;
 

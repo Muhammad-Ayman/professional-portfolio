@@ -167,15 +167,35 @@ export default function About() {
                 <h3 className="text-2xl font-display font-bold">Regions</h3>
               </div>
               <div className="space-y-3">
-                {profile.regions.map((region, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-3 p-3 bg-foreground/2 rounded-lg hover:bg-foreground/5 transition-colors"
-                  >
-                    <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    <p className="text-foreground/80">{region}</p>
-                  </div>
-                ))}
+                {profile.regions.map((region, index) => {
+                  // Map Arabic region names to English and flags
+                  const regionMap: Record<string, { english: string; flag: string }> = {
+                    "مصر": { english: "Egypt", flag: "🇪🇬" },
+                    "السعودية": { english: "Saudi Arabia", flag: "🇸🇦" },
+                    "الإمارات": { english: "UAE", flag: "🇦🇪" },
+                    "البحرين": { english: "Bahrain", flag: "🇧🇭" },
+                    "الكويت": { english: "Kuwait", flag: "🇰🇼" },
+                    "أمريكا": { english: "United States", flag: "🇺🇸" },
+                  };
+                  
+                  const regionInfo = regionMap[region] || { english: region, flag: "🌍" };
+                  
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-3 bg-foreground/2 rounded-lg hover:bg-foreground/5 transition-colors"
+                    >
+                      <span className="text-2xl" role="img" aria-label={regionInfo.english}>
+                        {regionInfo.flag}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <p className="text-foreground font-medium">{region}</p>
+                        <span className="text-foreground/40">•</span>
+                        <p className="text-foreground/70">{regionInfo.english}</p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

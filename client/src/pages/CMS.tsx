@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useProfile, useCaseStudies, useInsights } from "@/hooks/useContent";
+import { useProfile, useCaseStudies, useInsights, useFAQs } from "@/hooks/useContent";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -7,7 +7,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus, Save, X, GripVertical, ArrowUp, ArrowDown } from "lucide-react";
 import ImageUpload from "@/components/ImageUpload";
-import type { Profile, CaseStudy, Insight } from "@shared/content";
+import type { Profile, CaseStudy, Insight, FAQ } from "@shared/content";
 
 const CMS_TOKEN_KEY = "cms_admin_token";
 
@@ -18,10 +18,12 @@ export default function CMS() {
   const { data: profile, isLoading: profileLoading, refetch: refetchProfile } = useProfile();
   const { data: caseStudies, isLoading: caseStudiesLoading, refetch: refetchCaseStudies } = useCaseStudies();
   const { data: insights, isLoading: insightsLoading, refetch: refetchInsights } = useInsights();
+  const { data: faqs, isLoading: faqsLoading, refetch: refetchFAQs } = useFAQs();
 
   const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
   const [editingCaseStudy, setEditingCaseStudy] = useState<CaseStudy | null>(null);
   const [editingInsight, setEditingInsight] = useState<Insight | null>(null);
+  const [editingFAQ, setEditingFAQ] = useState<FAQ | null>(null);
 
   // Load token from localStorage on mount and verify it
   useEffect(() => {
@@ -293,6 +295,84 @@ export default function CMS() {
     }
   };
 
+  // FAQ handlers
+  const handleCreateFAQ = () => {
+    setEditingFAQ({
+      id: "",
+      question: "",
+      answer: "",
+    });
+  };
+
+  const handleSaveFAQ = async () => {
+    if (!editingFAQ) return;
+    try {
+      if (editingFAQ.id) {
+        await apiCall(`/api/content/faqs/${editingFAQ.id}`, {
+          method: "PUT",
+          body: JSON.stringify(editingFAQ),
+        });
+        toast.success("FAQ updated");
+      } else {
+        const { id, ...faqData } = editingFAQ;
+        await apiCall("/api/content/faqs", {
+          method: "POST",
+          body: JSON.stringify(faqData),
+        });
+        toast.success("FAQ created");
+      }
+      refetchFAQs();
+      setEditingFAQ(null);
+    } catch (error) {
+      toast.error(`Failed to save FAQ: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+  };
+
+  const handleDeleteFAQ = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this FAQ?")) return;
+    try {
+      await apiCall(`/api/content/faqs/${id}`, { method: "DELETE" });
+      toast.success("FAQ deleted");
+      refetchFAQs();
+    } catch (error) {
+      toast.error(`Failed to delete: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+  };
+
+  const handleMoveFAQ = async (id: string, direction: "up" | "down") => {
+    if (!faqs) return;
+    
+    const sortedFAQs = [...faqs].sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+    const currentIndex = sortedFAQs.findIndex(faq => faq.id === id);
+    
+    if (currentIndex === -1) return;
+    if (direction === "up" && currentIndex === 0) return;
+    if (direction === "down" && currentIndex === sortedFAQs.length - 1) return;
+
+    const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    
+    const currentFAQ = sortedFAQs[currentIndex];
+    const targetFAQ = sortedFAQs[newIndex];
+    
+    try {
+      await Promise.all([
+        apiCall(`/api/content/faqs/${currentFAQ.id}`, {
+          method: "PUT",
+          body: JSON.stringify({ ...currentFAQ, order: newIndex }),
+        }),
+        apiCall(`/api/content/faqs/${targetFAQ.id}`, {
+          method: "PUT",
+          body: JSON.stringify({ ...targetFAQ, order: currentIndex }),
+        }),
+      ]);
+      
+      toast.success("Order updated");
+      refetchFAQs();
+    } catch (error) {
+      toast.error(`Failed to reorder: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -354,10 +434,11 @@ export default function CMS() {
 
       <div className="container py-8">
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-4 mb-8">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="case-studies">Case Studies</TabsTrigger>
             <TabsTrigger value="insights">Insights</TabsTrigger>
+            <TabsTrigger value="faqs">FAQs</TabsTrigger>
           </TabsList>
 
           {/* Profile Tab */}
@@ -912,6 +993,105 @@ export default function CMS() {
                           <Pencil className="size-4" />
                         </Button>
                         <Button size="sm" variant="outline" onClick={() => handleDeleteInsight(insight.id)}>
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* FAQs Tab */}
+          <TabsContent value="faqs">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">FAQs</h2>
+              <Button onClick={handleCreateFAQ}>
+                <Plus className="size-4 mr-2" />
+                New FAQ
+              </Button>
+            </div>
+
+            {faqsLoading ? (
+              <div className="flex justify-center py-12">
+                <Spinner className="size-8" />
+              </div>
+            ) : editingFAQ ? (
+              <Card className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold">{editingFAQ.id ? "Edit" : "Create"} FAQ</h3>
+                  <div className="flex gap-2">
+                    <Button onClick={handleSaveFAQ} className="bg-primary">
+                      <Save className="size-4 mr-2" />
+                      Save
+                    </Button>
+                    <Button variant="outline" onClick={() => setEditingFAQ(null)}>
+                      <X className="size-4 mr-2" />
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-4 max-w-2xl">
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">Question *</label>
+                    <input
+                      type="text"
+                      value={editingFAQ.question}
+                      onChange={(e) => setEditingFAQ({ ...editingFAQ, question: e.target.value })}
+                      placeholder="What services do you offer?"
+                      className="w-full px-4 py-2 bg-background border border-foreground/20 rounded-lg"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">Answer *</label>
+                    <textarea
+                      value={editingFAQ.answer}
+                      onChange={(e) => setEditingFAQ({ ...editingFAQ, answer: e.target.value })}
+                      rows={6}
+                      placeholder="I offer proposal strategy consulting..."
+                      className="w-full px-4 py-2 bg-background border border-foreground/20 rounded-lg"
+                    />
+                  </div>
+                </div>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {faqs
+                  ?.sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
+                  .map((faq, index) => (
+                  <Card key={faq.id} className="p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="flex flex-col gap-2 pt-1">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => handleMoveFAQ(faq.id, "up")}
+                          disabled={index === 0}
+                          className="h-8 w-8 p-0"
+                        >
+                          <ArrowUp className="size-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => handleMoveFAQ(faq.id, "down")}
+                          disabled={index === (faqs?.length ?? 0) - 1}
+                          className="h-8 w-8 p-0"
+                        >
+                          <ArrowDown className="size-4" />
+                        </Button>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold mb-2">{faq.question}</h3>
+                        <p className="text-foreground/70">{faq.answer}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" onClick={() => setEditingFAQ(faq)}>
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => handleDeleteFAQ(faq.id)}>
                           <Trash2 className="size-4" />
                         </Button>
                       </div>

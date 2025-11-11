@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { CaseStudy, ContentData, Insight, Profile } from "../shared/content";
+import { CaseStudy, ContentData, FAQ, Insight, Profile } from "../shared/content";
 
 const prisma = new PrismaClient();
 
@@ -64,10 +64,11 @@ function transformProfileToPrisma(profile: Profile) {
 }
 
 export async function getAllContent(): Promise<ContentData> {
-  const [profileData, caseStudies, insights] = await Promise.all([
+  const [profileData, caseStudies, insights, faqs] = await Promise.all([
     prisma.profile.findUnique({ where: { id: "profile" } }),
     prisma.caseStudy.findMany(),
     prisma.insight.findMany(),
+    prisma.fAQ.findMany(),
   ]);
 
   if (!profileData) {
@@ -80,6 +81,7 @@ export async function getAllContent(): Promise<ContentData> {
     profile,
     caseStudies,
     insights,
+    faqs,
   };
 }
 
@@ -262,6 +264,61 @@ export async function deleteInsight(id: string): Promise<void> {
   } catch (error: any) {
     if (error.code === "P2025") {
       throw createNotFoundError("Insight");
+    }
+    throw error;
+  }
+}
+
+export async function getFAQs(): Promise<FAQ[]> {
+  return prisma.fAQ.findMany({
+    orderBy: [
+      { order: "asc" },
+      { createdAt: "asc" },
+    ],
+  });
+}
+
+export async function createFAQ(
+  payload: Omit<FAQ, "id"> & Partial<Pick<FAQ, "id">>
+): Promise<FAQ> {
+  const data: any = {
+    question: payload.question,
+    answer: payload.answer,
+    order: payload.order,
+  };
+
+  if (payload.id) {
+    data.id = payload.id;
+  }
+
+  return prisma.fAQ.create({ data });
+}
+
+export async function updateFAQ(
+  id: string,
+  payload: Partial<FAQ>
+): Promise<FAQ> {
+  try {
+    return await prisma.fAQ.update({
+      where: { id },
+      data: payload,
+    });
+  } catch (error: any) {
+    if (error.code === "P2025") {
+      throw createNotFoundError("FAQ");
+    }
+    throw error;
+  }
+}
+
+export async function deleteFAQ(id: string): Promise<void> {
+  try {
+    await prisma.fAQ.delete({
+      where: { id },
+    });
+  } catch (error: any) {
+    if (error.code === "P2025") {
+      throw createNotFoundError("FAQ");
     }
     throw error;
   }

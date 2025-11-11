@@ -4,7 +4,7 @@ import { useState } from "react";
 import SEOHead from "@/components/SEOHead";
 import { buildPageSEO } from "@/lib/seo";
 import { Spinner } from "@/components/ui/spinner";
-import { useProfile } from "@/hooks/useContent";
+import { useProfile, useFAQs } from "@/hooks/useContent";
 import LottieAnimation from "@/components/LottieAnimation";
 // animations loaded via CDN URLs using LottieAnimation `src`
 
@@ -19,6 +19,7 @@ export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { data: profile, isLoading, isError } = useProfile();
+  const { data: faqs, isLoading: faqsLoading } = useFAQs();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -285,47 +286,29 @@ export default function Contact() {
             Frequently Asked Questions
           </h2>
 
-          <div className="space-y-6">
-            <details className="group border border-foreground/10 rounded-lg p-6 cursor-pointer hover:border-primary/30 transition-colors">
-              <summary className="flex items-center justify-between font-semibold text-lg">
-                <span>What services do you offer?</span>
-                <span className="transition-transform group-open:rotate-180">▼</span>
-              </summary>
-              <p className="mt-4 text-foreground/70">
-                I offer proposal strategy consulting, team leadership development, compliance excellence training, and mentoring for proposal professionals. I work with organizations of all sizes across government, enterprise, and technology sectors.
-              </p>
-            </details>
-
-            <details className="group border border-foreground/10 rounded-lg p-6 cursor-pointer hover:border-primary/30 transition-colors">
-              <summary className="flex items-center justify-between font-semibold text-lg">
-                <span>How do you approach proposal strategy?</span>
-                <span className="transition-transform group-open:rotate-180">▼</span>
-              </summary>
-              <p className="mt-4 text-foreground/70">
-                I start with deep analysis of the opportunity and competitive landscape. Then I develop a positioning strategy that differentiates your organization and addresses key evaluation criteria. Finally, I help execute with rigor and excellence across all compliance and narrative elements.
-              </p>
-            </details>
-
-            <details className="group border border-foreground/10 rounded-lg p-6 cursor-pointer hover:border-primary/30 transition-colors">
-              <summary className="flex items-center justify-between font-semibold text-lg">
-                <span>What's your availability for consulting?</span>
-                <span className="transition-transform group-open:rotate-180">▼</span>
-              </summary>
-              <p className="mt-4 text-foreground/70">
-                I work with a limited number of clients to ensure quality and focus. I typically take on 2-3 engagements per year. Contact me to discuss your needs and timeline.
-              </p>
-            </details>
-
-            <details className="group border border-foreground/10 rounded-lg p-6 cursor-pointer hover:border-primary/30 transition-colors">
-              <summary className="flex items-center justify-between font-semibold text-lg">
-                <span>Do you offer speaking engagements?</span>
-                <span className="transition-transform group-open:rotate-180">▼</span>
-              </summary>
-              <p className="mt-4 text-foreground/70">
-                Yes, I regularly speak at industry conferences and corporate events on proposal strategy, leadership, and business development. I'm happy to discuss speaking opportunities.
-              </p>
-            </details>
-          </div>
+          {faqsLoading ? (
+            <div className="flex justify-center py-12">
+              <Spinner className="size-8" />
+            </div>
+          ) : faqs && faqs.length > 0 ? (
+            <div className="space-y-6">
+              {faqs
+                .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
+                .map((faq) => (
+                <details key={faq.id} className="group border border-foreground/10 rounded-lg p-6 cursor-pointer hover:border-primary/30 transition-colors">
+                  <summary className="flex items-center justify-between font-semibold text-lg">
+                    <span>{faq.question}</span>
+                    <span className="transition-transform group-open:rotate-180">▼</span>
+                  </summary>
+                  <p className="mt-4 text-foreground/70">
+                    {faq.answer}
+                  </p>
+                </details>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-foreground/60 py-12">No FAQs available yet.</p>
+          )}
         </div>
       </section>
     </div>

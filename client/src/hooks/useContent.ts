@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchCaseStudies, fetchContent, fetchInsights, fetchProfile } from "@/api/content";
+import { fetchCaseStudies, fetchContent, fetchFAQs, fetchInsights, fetchProfile } from "@/api/content";
 
 const STALE_TIME = 1000 * 60 * 5;
 
@@ -31,6 +31,14 @@ export function useInsights() {
   return useQuery({
     queryKey: ["content", "insights"] as const,
     queryFn: fetchInsights,
+    staleTime: STALE_TIME,
+  });
+}
+
+export function useFAQs() {
+  return useQuery({
+    queryKey: ["content", "faqs"] as const,
+    queryFn: fetchFAQs,
     staleTime: STALE_TIME,
   });
 }
