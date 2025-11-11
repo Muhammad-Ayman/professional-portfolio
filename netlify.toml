@@ -1,9 +1,13 @@
 [build]
-  command = "pnpm run build"
+  command = "rm -rf dist && DATABASE_URL=postgresql://dummy:dummy@localhost:5432/db pnpm prisma generate && pnpm vite build && pnpm esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist"
   publish = "dist/public"
+
+[build.processing]
+  skip_processing = false
 
 [build.environment]
   NODE_VERSION = "20"
+  NPM_FLAGS = "--legacy-peer-deps"
 
 # Redirect all routes to index.html for SPA routing
 [[redirects]]
