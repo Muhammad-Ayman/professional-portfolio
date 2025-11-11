@@ -5,6 +5,7 @@ import SEOHead from "@/components/SEOHead";
 import { buildPageSEO } from "@/lib/seo";
 import { Spinner } from "@/components/ui/spinner";
 import { useCaseStudies, useProfile } from "@/hooks/useContent";
+import HoverImage from "@/components/HoverImage";
 
 export default function Home() {
   const { data: profile, isLoading: isProfileLoading, isError: isProfileError } = useProfile();
@@ -145,12 +146,12 @@ export default function Home() {
               >
                 {/* Image */}
                 <div className={`relative h-80 rounded-lg overflow-hidden ${index % 2 === 1 ? "md:order-2" : ""}`}>
-                  <img
+                  <HoverImage
                     src={caseStudy.image}
                     alt={caseStudy.title}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent pointer-events-none"></div>
                 </div>
 
                 {/* Content */}

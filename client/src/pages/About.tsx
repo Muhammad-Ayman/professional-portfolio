@@ -5,6 +5,7 @@ import SEOHead from "@/components/SEOHead";
 import { buildPageSEO } from "@/lib/seo";
 import { Spinner } from "@/components/ui/spinner";
 import { useProfile } from "@/hooks/useContent";
+import HoverImage from "@/components/HoverImage";
 
 export default function About() {
   const { data: profile, isLoading, isError } = useProfile();
@@ -61,13 +62,13 @@ export default function About() {
             {/* Photo */}
             <div className="relative animate-slideInLeft">
               <div className="aspect-square rounded-lg overflow-hidden border border-foreground/10">
-                <img
+                <HoverImage
                   src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop"
                   alt={profile.name}
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-primary/10 rounded-lg blur-2xl"></div>
+              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-primary/10 rounded-lg blur-2xl pointer-events-none"></div>
             </div>
 
             {/* Bio */}

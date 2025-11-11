@@ -1,20 +1,7 @@
-import { randomUUID } from "node:crypto";
-import fs from "node:fs";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { PrismaClient } from "@prisma/client";
 import { CaseStudy, ContentData, Insight, Profile } from "../shared/content";
 
-type Collection = "profile" | "caseStudies" | "insights";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const fileMap: Record<Collection, string> = {
-  profile: "profile.json",
-  caseStudies: "caseStudies.json",
-  insights: "insights.json",
-};
+const prisma = new PrismaClient();
 
 function createNotFoundError(resource: string) {
   const error = new Error(`${resource} not found`);
@@ -22,52 +9,70 @@ function createNotFoundError(resource: string) {
   return error;
 }
 
-function resolveDataDir(): string {
-  if (process.env.CMS_DATA_DIR) {
-    return path.resolve(process.env.CMS_DATA_DIR);
-  }
-
-  const candidateDirs = [
-    path.resolve(__dirname, "data"),
-    path.resolve(__dirname, "..", "data"),
-    path.resolve(process.cwd(), "server", "data"),
-    path.resolve(process.cwd(), "dist", "data"),
-  ];
-
-  for (const dir of candidateDirs) {
-    if (fs.existsSync(dir)) {
-      return dir;
-    }
-  }
-
-  throw new Error("Unable to locate CMS data directory. Set CMS_DATA_DIR or ensure server/data exists.");
+// Transform Prisma Profile to app Profile format
+function transformProfile(prismaProfile: any): Profile {
+  return {
+    name: prismaProfile.name,
+    title: prismaProfile.title,
+    tagline: prismaProfile.tagline,
+    email: prismaProfile.email,
+    phone: prismaProfile.phone,
+    location: prismaProfile.location,
+    linkedin: prismaProfile.linkedin,
+    twitter: prismaProfile.twitter,
+    stats: {
+      years: prismaProfile.statsYears,
+      proposals: prismaProfile.statsProposals,
+      clients: prismaProfile.statsClients,
+      successRate: prismaProfile.statsSuccessRate,
+    },
+    bio: {
+      short: prismaProfile.bioShort,
+      full: prismaProfile.bioFull,
+    },
+    mission: prismaProfile.mission,
+    philosophy: prismaProfile.philosophy,
+    sectors: prismaProfile.sectors,
+    regions: prismaProfile.regions,
+  };
 }
 
-const dataDir = resolveDataDir();
-
-async function ensureDataDir() {
-  await mkdir(dataDir, { recursive: true });
-}
-
-async function readCollection<T>(collection: Collection): Promise<T> {
-  const filePath = path.resolve(dataDir, fileMap[collection]);
-  const fileContents = await readFile(filePath, "utf-8");
-  return JSON.parse(fileContents) as T;
-}
-
-async function writeCollection<T>(collection: Collection, data: T) {
-  await ensureDataDir();
-  const filePath = path.resolve(dataDir, fileMap[collection]);
-  const serialized = JSON.stringify(data, null, 2);
-  await writeFile(filePath, serialized, "utf-8");
+// Transform app Profile to Prisma format
+function transformProfileToPrisma(profile: Profile) {
+  return {
+    name: profile.name,
+    title: profile.title,
+    tagline: profile.tagline,
+    email: profile.email,
+    phone: profile.phone,
+    location: profile.location,
+    linkedin: profile.linkedin,
+    twitter: profile.twitter,
+    statsYears: profile.stats.years,
+    statsProposals: profile.stats.proposals,
+    statsClients: profile.stats.clients,
+    statsSuccessRate: profile.stats.successRate,
+    bioShort: profile.bio.short,
+    bioFull: profile.bio.full,
+    mission: profile.mission,
+    philosophy: profile.philosophy,
+    sectors: profile.sectors,
+    regions: profile.regions,
+  };
 }
 
 export async function getAllContent(): Promise<ContentData> {
-  const [profile, caseStudies, insights] = await Promise.all([
-    readCollection<Profile>("profile"),
-    readCollection<CaseStudy[]>("caseStudies"),
-    readCollection<Insight[]>("insights"),
+  const [profileData, caseStudies, insights] = await Promise.all([
+    prisma.profile.findUnique({ where: { id: "profile" } }),
+    prisma.caseStudy.findMany(),
+    prisma.insight.findMany(),
   ]);
+
+  if (!profileData) {
+    throw createNotFoundError("Profile");
+  }
+
+  const profile = transformProfile(profileData);
 
   return {
     profile,
@@ -77,79 +82,159 @@ export async function getAllContent(): Promise<ContentData> {
 }
 
 export async function getProfile(): Promise<Profile> {
-  return readCollection<Profile>("profile");
+  const profileData = await prisma.profile.findUnique({ 
+    where: { id: "profile" } 
+  });
+
+  if (!profileData) {
+    throw createNotFoundError("Profile");
+  }
+
+  return transformProfile(profileData);
 }
 
 export async function updateProfile(profile: Profile): Promise<Profile> {
-  await writeCollection("profile", profile);
-  return profile;
+  const prismaProfile = transformProfileToPrisma(profile);
+  
+  const updated = await prisma.profile.upsert({
+    where: { id: "profile" },
+    update: prismaProfile,
+    create: {
+      id: "profile",
+      ...prismaProfile,
+    },
+  });
+
+  return transformProfile(updated);
 }
 
 export async function getCaseStudies(): Promise<CaseStudy[]> {
-  return readCollection<CaseStudy[]>("caseStudies");
+  return prisma.caseStudy.findMany({
+    orderBy: [
+      { featured: "desc" },
+      { createdAt: "desc" },
+    ],
+  });
 }
 
-export async function createCaseStudy(payload: Omit<CaseStudy, "id"> & Partial<Pick<CaseStudy, "id">>): Promise<CaseStudy> {
-  const caseStudies = await getCaseStudies();
-  const id = payload.id ?? randomUUID();
-  const record: CaseStudy = { ...payload, id } as CaseStudy;
-  caseStudies.push(record);
-  await writeCollection("caseStudies", caseStudies);
-  return record;
-}
+export async function createCaseStudy(
+  payload: Omit<CaseStudy, "id"> & Partial<Pick<CaseStudy, "id">>
+): Promise<CaseStudy> {
+  const data: any = {
+    title: payload.title,
+    client: payload.client,
+    sector: payload.sector,
+    contractValue: payload.contractValue,
+    country: payload.country,
+    description: payload.description,
+    keyAchievements: payload.keyAchievements,
+    image: payload.image,
+    featured: payload.featured,
+  };
 
-export async function updateCaseStudy(id: string, payload: Partial<CaseStudy>): Promise<CaseStudy> {
-  const caseStudies = await getCaseStudies();
-  const index = caseStudies.findIndex((cs) => cs.id === id);
-  if (index === -1) {
-    throw createNotFoundError("Case study");
+  if (payload.id) {
+    data.id = payload.id;
   }
-  const updated = { ...caseStudies[index], ...payload, id };
-  caseStudies[index] = updated;
-  await writeCollection("caseStudies", caseStudies);
-  return updated;
+
+  return prisma.caseStudy.create({ data });
+}
+
+export async function updateCaseStudy(
+  id: string,
+  payload: Partial<CaseStudy>
+): Promise<CaseStudy> {
+  try {
+    return await prisma.caseStudy.update({
+      where: { id },
+      data: payload,
+    });
+  } catch (error: any) {
+    if (error.code === "P2025") {
+      throw createNotFoundError("Case study");
+    }
+    throw error;
+  }
 }
 
 export async function deleteCaseStudy(id: string): Promise<void> {
-  const caseStudies = await getCaseStudies();
-  const filtered = caseStudies.filter((cs) => cs.id !== id);
-  if (filtered.length === caseStudies.length) {
-    throw createNotFoundError("Case study");
+  try {
+    await prisma.caseStudy.delete({
+      where: { id },
+    });
+  } catch (error: any) {
+    if (error.code === "P2025") {
+      throw createNotFoundError("Case study");
+    }
+    throw error;
   }
-  await writeCollection("caseStudies", filtered);
 }
 
 export async function getInsights(): Promise<Insight[]> {
-  return readCollection<Insight[]>("insights");
+  return prisma.insight.findMany({
+    orderBy: [
+      { featured: "desc" },
+      { date: "desc" },
+    ],
+  });
 }
 
-export async function createInsight(payload: Omit<Insight, "id"> & Partial<Pick<Insight, "id">>): Promise<Insight> {
-  const insights = await getInsights();
-  const id = payload.id ?? randomUUID();
-  const record: Insight = { ...payload, id } as Insight;
-  insights.push(record);
-  await writeCollection("insights", insights);
-  return record;
-}
+export async function createInsight(
+  payload: Omit<Insight, "id"> & Partial<Pick<Insight, "id">>
+): Promise<Insight> {
+  const data: any = {
+    title: payload.title,
+    excerpt: payload.excerpt,
+    content: payload.content,
+    category: payload.category,
+    date: payload.date,
+    readTime: payload.readTime,
+    featured: payload.featured,
+  };
 
-export async function updateInsight(id: string, payload: Partial<Insight>): Promise<Insight> {
-  const insights = await getInsights();
-  const index = insights.findIndex((item) => item.id === id);
-  if (index === -1) {
-    throw createNotFoundError("Insight");
+  if (payload.id) {
+    data.id = payload.id;
   }
-  const updated = { ...insights[index], ...payload, id };
-  insights[index] = updated;
-  await writeCollection("insights", insights);
-  return updated;
+
+  return prisma.insight.create({ data });
+}
+
+export async function updateInsight(
+  id: string,
+  payload: Partial<Insight>
+): Promise<Insight> {
+  try {
+    return await prisma.insight.update({
+      where: { id },
+      data: payload,
+    });
+  } catch (error: any) {
+    if (error.code === "P2025") {
+      throw createNotFoundError("Insight");
+    }
+    throw error;
+  }
 }
 
 export async function deleteInsight(id: string): Promise<void> {
-  const insights = await getInsights();
-  const filtered = insights.filter((item) => item.id !== id);
-  if (filtered.length === insights.length) {
-    throw createNotFoundError("Insight");
+  try {
+    await prisma.insight.delete({
+      where: { id },
+    });
+  } catch (error: any) {
+    if (error.code === "P2025") {
+      throw createNotFoundError("Insight");
+    }
+    throw error;
   }
-  await writeCollection("insights", filtered);
 }
 
+// Graceful shutdown
+process.on("SIGINT", async () => {
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+process.on("SIGTERM", async () => {
+  await prisma.$disconnect();
+  process.exit(0);
+});
