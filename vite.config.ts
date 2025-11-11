@@ -21,11 +21,11 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(rootDir, "src"),
-      "@shared": path.resolve(import.meta.dirname, "shared"),
-      "@assets": path.resolve(import.meta.dirname, "attached_assets"),
+      "@shared": path.resolve(__dirname, "shared"),
+      "@assets": path.resolve(__dirname, "attached_assets"),
     },
   },
-  envDir: path.resolve(import.meta.dirname),
+  envDir: __dirname,
   root: rootDir,
   build: {
     outDir: outDir,
