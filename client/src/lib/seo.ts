@@ -66,11 +66,15 @@ export function resolveProfile(profile?: Profile): Profile {
 
 export function buildSiteConfig(profile?: Profile) {
   const data = resolveProfile(profile);
+  // Use environment variable or fallback to window.location for client-side, or empty string for SSR
+  const siteUrl = typeof window !== "undefined" 
+    ? window.location.origin 
+    : (import.meta.env.VITE_SITE_URL || "");
   return {
     name: data.name,
     description: data.bio.short,
-    url: "https://example.com",
-    ogImage: "https://example.com/og-image.png",
+    url: siteUrl,
+    ogImage: `${siteUrl}/og-image.png`,
     twitter: "@johndoe",
     author: data.name,
   };
@@ -188,22 +192,27 @@ export function generateMetaTags(metadata: SEOMetadata) {
 }
 
 export function getCanonicalUrl(path: string): string {
-  return `${siteConfig.url}${path}`;
+  // Use current origin if siteConfig.url is empty (for relative URLs)
+  const baseUrl = siteConfig.url || (typeof window !== "undefined" ? window.location.origin : "");
+  return `${baseUrl}${path}`;
 }
 
 export function buildPersonStructuredData(profile?: Profile) {
   const data = resolveProfile(profile);
+  const siteUrl = typeof window !== "undefined" 
+    ? window.location.origin 
+    : (import.meta.env.VITE_SITE_URL || "");
   return {
     "@context": "https://schema.org",
     "@type": "Person",
     name: data.name,
     jobTitle: data.title,
     description: data.bio.short,
-    url: "https://example.com",
+    url: siteUrl,
     email: data.email,
     telephone: data.phone,
     sameAs: data.linkedin ? [data.linkedin] : [],
-    image: "https://example.com/profile-image.jpg",
+    image: data.profileImage || `${siteUrl}/profile-image.jpg`,
     worksFor: {
       "@type": "Organization",
       name: "Independent Consultant",
@@ -213,13 +222,16 @@ export function buildPersonStructuredData(profile?: Profile) {
 
 export function buildOrganizationSchema(profile?: Profile) {
   const data = resolveProfile(profile);
+  const siteUrl = typeof window !== "undefined" 
+    ? window.location.origin 
+    : (import.meta.env.VITE_SITE_URL || "");
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: data.name,
     description: data.bio.short,
-    url: "https://example.com",
-    logo: "https://example.com/logo.png",
+    url: siteUrl,
+    logo: `${siteUrl}/logo.png`,
     sameAs: data.linkedin ? [data.linkedin] : [],
     contactPoint: {
       "@type": "ContactPoint",
