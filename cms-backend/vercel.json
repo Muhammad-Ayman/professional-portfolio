@@ -1,0 +1,11 @@
+{
+  "buildCommand": "pnpm build",
+  "installCommand": "pnpm install && pnpm prisma generate",
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "@api_url",
+    "DATABASE_URL": "@database_url",
+    "CMS_ADMIN_TOKEN": "@cms_admin_token"
+  }
+}
+

@@ -1,0 +1,219 @@
+# Professional Portfolio - CMS Backend
+
+This project contains both the CMS frontend (Next.js) and the API backend (Express + Prisma).
+
+## Tech Stack
+
+- **Next.js 15** - CMS frontend & API routes framework
+- **React 19** - UI library
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **Prisma** - Database ORM (SQLite)
+- **Resend** - Email service
+
+## Project Structure
+
+```
+cms-backend/
+├── src/                  # Next.js application
+│   ├── app/             # App router pages & API routes
+│   ├── components/      # React components
+│   ├── lib/             # Server utilities (Prisma, auth, validation)
+│   └── types/           # TypeScript types
+├── data/                # Seed data JSON files
+├── prisma/              # Database schema and migrations
+├── scripts/             # Utility scripts
+├── prisma.config.ts
+└── package.json
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and pnpm
+
+### Installation
+
+```bash
+pnpm install
+```
+
+### Environment Setup
+
+1. Copy `.env.local` and configure:
+
+```bash
+# .env.local
+
+# API URL (optional). Defaults to /api when not provided.
+# Set this if you host the API under a different domain.
+NEXT_PUBLIC_API_URL=/api
+
+# Database
+DATABASE_URL="file:./dev.db"
+
+# Admin token for CMS access
+CMS_ADMIN_TOKEN=your_secure_token_here
+
+# Email service (optional, for contact form)
+RESEND_API_KEY=your_resend_api_key_here
+```
+
+2. Generate a secure admin token:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+### Database Setup
+
+```bash
+# Generate Prisma client
+pnpm prisma generate
+
+# Run migrations
+pnpm prisma migrate deploy
+
+# Seed the database with initial data
+pnpm seed
+```
+
+### Development
+
+Run a single command to start both the CMS UI and API routes:
+
+```bash
+pnpm dev
+```
+
+This starts the Next.js app (and all `/api` endpoints) on `http://localhost:3000`. Then open the CMS in your browser.
+
+### Production Build
+
+```bash
+pnpm build
+pnpm start
+```
+
+This will run the compiled Next.js app (including API routes) on the configured port.
+
+## Deployment
+
+### Option 1: Deploy Together (Single Server)
+
+Best for platforms like Railway, Render, or a VPS.
+
+1. Build the Next.js app
+2. Deploy both the Express server and Next.js
+3. Set environment variables
+4. Run migrations
+
+Example `start` script:
+```json
+{
+  "start": "node server.js & next start"
+}
+```
+
+### Option 2: Deploy Separately
+
+#### CMS Frontend (Vercel/Netlify)
+1. Deploy Next.js app to Vercel or Netlify
+2. Set `NEXT_PUBLIC_API_URL` to your API server URL
+3. Build command: `pnpm build`
+4. Output directory: `.next`
+
+#### API Backend (Railway/Render/Heroku)
+1. Deploy the Express server
+2. Set all environment variables including `DATABASE_URL`
+3. Run migrations on first deploy
+4. Start command: `node server.js`
+
+### Option 3: Serverless (Vercel)
+
+Deploy everything to Vercel:
+1. The Next.js app handles the CMS frontend
+2. You'll need to convert Express routes to Vercel serverless functions or use a different deployment strategy
+
+## Database Management
+
+### View Database
+```bash
+pnpm prisma studio
+```
+
+### Create a Migration
+```bash
+pnpm prisma migrate dev --name your_migration_name
+```
+
+### Backup Database
+```bash
+pnpm backup
+```
+
+### Test Database Connection
+```bash
+pnpm test:db
+```
+
+## API Endpoints
+
+All API endpoints are prefixed with `/api/`:
+
+### Content Management
+- `GET /api/content/profile` - Get profile data
+- `PUT /api/content/profile` - Update profile
+- `GET /api/content/case-studies` - List case studies
+- `POST /api/content/case-studies` - Create case study
+- `PUT /api/content/case-studies/:id` - Update case study
+- `DELETE /api/content/case-studies/:id` - Delete case study
+- `GET /api/content/insights` - List insights
+- `POST /api/content/insights` - Create insight
+- `PUT /api/content/insights/:id` - Update insight
+- `DELETE /api/content/insights/:id` - Delete insight
+- `GET /api/content/faqs` - List FAQs
+- `POST /api/content/faqs` - Create FAQ
+- `PUT /api/content/faqs/:id` - Update FAQ
+- `DELETE /api/content/faqs/:id` - Delete FAQ
+
+### Authentication
+- `POST /api/content/verify-token` - Verify admin token
+
+### File Upload
+- `POST /api/upload` - Upload image
+
+### Email
+- `POST /api/email/contact` - Send contact form email
+
+## Security
+
+- All CMS operations require authentication via Bearer token
+- Token is stored in localStorage and sent with each request
+- API validates token on every request
+- Set a strong `CMS_ADMIN_TOKEN` in production
+- CORS is configured to allow requests from your frontend domain
+  - In development: All origins are allowed for easier testing
+  - In production: Set `ALLOWED_ORIGINS` environment variable with your frontend URLs
+
+## Environment Variables
+
+### Required
+- `DATABASE_URL` - Database connection string
+- `CMS_ADMIN_TOKEN` - Admin authentication token
+- `NEXT_PUBLIC_API_URL` - API server URL (for CMS frontend)
+
+### Optional
+- `ALLOWED_ORIGINS` - Comma-separated list of allowed CORS origins (for production)
+  - Example: `https://your-frontend.com,https://www.your-frontend.com`
+  - In development, all origins are allowed by default
+  - Default: localhost ports (3000, 5173, 5174)
+- `RESEND_API_KEY` - For email functionality
+- `PORT` - API server port (default: 4000)
+- `NODE_ENV` - Environment mode (`development` or `production`)
+
+## License
+
+MIT
+
