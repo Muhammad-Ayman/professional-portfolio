@@ -1,6 +1,6 @@
 # Professional Portfolio - CMS Backend
 
-This project contains both the CMS frontend (Next.js) and the API backend (Express + Prisma).
+This project contains both the CMS frontend and the API backend, all integrated in a single Next.js application.
 
 ## Tech Stack
 
