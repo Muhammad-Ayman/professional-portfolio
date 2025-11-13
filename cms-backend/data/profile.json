@@ -19,6 +19,7 @@
     "full": "With 6+ years of experience in RFPs, tenders, grants, and business development, I bridge the gap between technical teams, pricing strategists, and client stakeholders to deliver customized, winning proposals. Whether it's a government TOR, a donor-funded RFQ, or a competitive NGO grant, I bring structure, strategy, and speed to every bid cycle.\n\nI specialize in:\n\n• Managing full bid lifecycles for complex service proposals\n• Writing compelling narratives in both English and Arabic\n• Aligning financial justifications with technical value\n• Designing and automating internal proposal systems\n• Coaching junior writers and building scalable bid units\n\nWhat sets me apart?\n\nI don't just submit proposals—I build pipelines, tell winning stories, and drive measurable results. I've increased win rates by 150%, improved internal workflows by 35%, and helped organizations shift from reactive bidding to proactive growth.\n\nCurrently leading the Proposals Department at EYouth, I work on regional bids for digital transformation, capacity building, training, and managed services.\n\nLet's connect if you're looking for someone who knows how to turn an RFP into a strategic growth opportunity."
   },
   "mission": "To empower organizations across the MEA region to win high-value funding and deliver meaningful impact through proposals that combine strategic clarity, operational feasibility, and measurable outcomes.",
+  "missionSupporting": "I aim to elevate the quality of proposal development across the sector transforming fragmented inputs into cohesive, fundable solutions that drive employment, digital transformation, and inclusive growth.",
   "philosophy": [
     "Strategy First: Every winning proposal begins with a strong strategic backbone. I believe in grounding proposals in clear priorities, rigorous analysis, and a compelling value narrative that aligns with donor expectations and national agendas.",
     "Precision in Execution: Excellence is not an abstract concept; it is built through process discipline. I operate with structured systems, compliance-focused workflows, and high standards for quality assurance to consistently deliver proposals that outperform competitors.",
@@ -34,8 +35,7 @@
     "Public Sector Capacity Building",
     "Sustainability & Green Economy",
     "Women’s Economic Empowerment"
-  ]
-  ,
+  ],
   "regions": [
     "مصر",
     "السعودية",
@@ -43,6 +43,43 @@
     "البحرين",
     "الكويت",
     "أمريكا"
-  ]
-  
+  ],
+  "approach": [
+    {
+      "title": "Deep Understanding Before Action",
+      "description": "Every engagement begins with clarity. I start by mapping the mandate, donor expectations, relevant policies, and the competitive landscape.",
+      "focus": "Focus: Needs analysis, RFP deconstruction, stakeholder alignment."
+    },
+    {
+      "title": "Strategy-Led Proposal Architecture",
+      "description": "Winning proposals require more than good writing—they need a strong core. I build a strategic framework that defines the solution, the differentiators, the impact pathways, and the technical scoring logic.",
+      "focus": "Focus: Value proposition, solution logic, theory of change, scoring strategy."
+    },
+    {
+      "title": "Collaborative, High-Performance Delivery",
+      "description": "I work as an extension of the internal team, creating a structured environment where technical experts, managers, and partners contribute effectively.",
+      "focus": "Focus: Team coordination, input management, structured workflows."
+    },
+    {
+      "title": "Precision, Compliance & Quality Assurance",
+      "description": "Compliance is the foundation of competitiveness. I apply quality checks across all components—technical, financial, operational, and annexes—to ensure the submission meets every requirement and maximizes evaluation scores.",
+      "focus": "Focus: Checklists, compliance matrices, revision cycles, formatting standards."
+    },
+    {
+      "title": "Impact-Centered Design",
+      "description": "Strong proposals do more than answer questions—they demonstrate long-term value. I design programs with clear KPIs, sustainability mechanisms, risk strategies, and measurable outcomes, ensuring proposals are not only fundable but implementable at scale.",
+      "focus": "Focus: KPIs, M&E logic, sustainability models, risk mitigation."
+    },
+    {
+      "title": "Delivery That Builds Internal Capacity",
+      "description": "My approach strengthens organizations beyond a single submission. I transfer processes, templates, and systems that help teams operate more efficiently and independently in future bids.",
+      "focus": "Focus: Templates, playbooks, knowledge transfer, continuous improvement."
+    }
+  ],
+  "cta": {
+    "heading": "Let's Work Together",
+    "body": "Whether you're looking to improve your proposal process, develop proposal strategy, or build a winning team, I'm here to help.",
+    "buttonLabel": "Get in Touch",
+    "buttonHref": "/contact"
+  }
 }

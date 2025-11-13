@@ -36,6 +36,11 @@ async function backup() {
     }
 
     // Transform profile back to original format
+    const approach = Array.isArray(profile.approach) ? profile.approach : [];
+    const hasCTA = Boolean(
+      profile.ctaHeading || profile.ctaBody || profile.ctaButtonLabel || profile.ctaButtonHref,
+    );
+
     const profileData = {
       name: profile.name,
       title: profile.title,
@@ -56,9 +61,21 @@ async function backup() {
         full: profile.bioFull,
       },
       mission: profile.mission,
+      missionSupporting: profile.missionSupporting ?? undefined,
       philosophy: profile.philosophy,
       sectors: profile.sectors,
       regions: profile.regions,
+      approach,
+      cta: hasCTA
+        ? {
+            heading: profile.ctaHeading ?? "Let's Work Together",
+            body:
+              profile.ctaBody ??
+              "Whether you're looking to improve your proposal process, develop proposal strategy, or build a winning team, I'm here to help.",
+            buttonLabel: profile.ctaButtonLabel ?? "Get in Touch",
+            buttonHref: profile.ctaButtonHref ?? "/contact",
+          }
+        : undefined,
     };
 
     // Create backups directory

@@ -1,3 +1,16 @@
+export interface ApproachStep {
+  title: string;
+  description: string;
+  focus?: string;
+}
+
+export interface ProfileCTA {
+  heading: string;
+  body: string;
+  buttonLabel: string;
+  buttonHref: string;
+}
+
 export interface Profile {
   name: string;
   title: string;
@@ -19,9 +32,12 @@ export interface Profile {
     full: string;
   };
   mission: string;
+  missionSupporting?: string;
   philosophy: string[];
   sectors: string[];
   regions: string[];
+  approach: ApproachStep[];
+  cta?: ProfileCTA;
 }
 
 export interface CaseStudy {

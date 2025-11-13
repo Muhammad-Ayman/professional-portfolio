@@ -8,11 +8,31 @@ import { Spinner } from "@/components/ui/spinner";
 import { toast, Toaster } from "sonner";
 import { ArrowDown, ArrowUp, Pencil, Plus, Save, Trash2, X } from "lucide-react";
 import ImageUpload from "@/components/image-upload";
-import type { CaseStudy, FAQ, Insight, Profile } from "@/types/content";
+import type {
+  ApproachStep,
+  CaseStudy,
+  FAQ,
+  Insight,
+  Profile,
+  ProfileCTA,
+} from "@/types/content";
 
 // CMS and API are in the same Next.js app
 const API_URL = "/api";
 const CMS_TOKEN_KEY = "cms_admin_token";
+const DEFAULT_CTA: ProfileCTA = {
+  heading: "Let's Work Together",
+  body:
+    "Whether you're looking to improve your proposal process, develop proposal strategy, or build a winning team, I'm here to help.",
+  buttonLabel: "Get in Touch",
+  buttonHref: "/contact",
+};
+
+const createEmptyApproachStep = (): ApproachStep => ({
+  title: "",
+  description: "",
+  focus: "",
+});
 
 class ApiError extends Error {
   status: number;
@@ -211,9 +231,69 @@ export default function CMSPage() {
   const handleSaveProfile = async () => {
     if (!editingProfile) return;
     try {
+      const trimmedCTA = editingProfile.cta
+        ? {
+            heading: editingProfile.cta.heading?.trim() ?? "",
+            body: editingProfile.cta.body?.trim() ?? "",
+            buttonLabel: editingProfile.cta.buttonLabel?.trim() ?? "",
+            buttonHref: editingProfile.cta.buttonHref?.trim() ?? "",
+          }
+        : undefined;
+
+      const sanitizedProfile: Profile = {
+        ...editingProfile,
+        name: editingProfile.name.trim(),
+        title: editingProfile.title.trim(),
+        tagline: editingProfile.tagline.trim(),
+        email: editingProfile.email.trim(),
+        phone: editingProfile.phone.trim(),
+        location: editingProfile.location.trim(),
+        profileImage: editingProfile.profileImage?.trim() || undefined,
+        linkedin: editingProfile.linkedin?.trim() || undefined,
+        twitter: editingProfile.twitter?.trim() || undefined,
+        stats: {
+          yearsOfExperience: editingProfile.stats.yearsOfExperience.trim(),
+          totalFundingSecured: editingProfile.stats.totalFundingSecured.trim(),
+          countries: editingProfile.stats.countries.trim(),
+          winningRate: editingProfile.stats.winningRate.trim(),
+        },
+        bio: {
+          short: editingProfile.bio.short.trim(),
+          full: editingProfile.bio.full.trim(),
+        },
+        mission: editingProfile.mission.trim(),
+        missionSupporting: editingProfile.missionSupporting?.trim() || undefined,
+        philosophy: editingProfile.philosophy
+          .map((item) => item.trim())
+          .filter((item) => item.length > 0),
+        sectors: editingProfile.sectors
+          .map((item) => item.trim())
+          .filter((item) => item.length > 0),
+        regions: editingProfile.regions
+          .map((item) => item.trim())
+          .filter((item) => item.length > 0),
+        approach: editingProfile.approach
+          .map((step) => ({
+            title: step.title.trim(),
+            description: step.description.trim(),
+            focus: step.focus?.trim() ? step.focus.trim() : undefined,
+          }))
+          .filter((step) => step.title.length > 0 && step.description.length > 0),
+        cta:
+          trimmedCTA &&
+          (trimmedCTA.heading || trimmedCTA.body || trimmedCTA.buttonLabel || trimmedCTA.buttonHref)
+            ? {
+                heading: trimmedCTA.heading || DEFAULT_CTA.heading,
+                body: trimmedCTA.body || DEFAULT_CTA.body,
+                buttonLabel: trimmedCTA.buttonLabel || DEFAULT_CTA.buttonLabel,
+                buttonHref: trimmedCTA.buttonHref || DEFAULT_CTA.buttonHref,
+              }
+            : undefined,
+      };
+
       await authorizedRequest("/content/profile", {
         method: "PUT",
-        body: JSON.stringify(editingProfile),
+        body: JSON.stringify(sanitizedProfile),
       });
       toast.success("Profile updated successfully");
       setEditingProfile(null);
@@ -619,6 +699,16 @@ export default function CMSPage() {
               value={editingProfile.tagline}
               onChange={(value) => setEditingProfile({ ...editingProfile, tagline: value })}
             />
+            <Field
+              label="LinkedIn URL"
+              value={editingProfile.linkedin ?? ""}
+              onChange={(value) => setEditingProfile({ ...editingProfile, linkedin: value })}
+            />
+            <Field
+              label="Twitter URL"
+              value={editingProfile.twitter ?? ""}
+              onChange={(value) => setEditingProfile({ ...editingProfile, twitter: value })}
+            />
           </div>
 
           <ImageUpload
@@ -672,6 +762,37 @@ export default function CMSPage() {
             />
           </div>
 
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="block text-sm font-semibold mb-2">Short Bio</label>
+              <textarea
+                value={editingProfile.bio.short}
+                onChange={(event) =>
+                  setEditingProfile({
+                    ...editingProfile,
+                    bio: { ...editingProfile.bio, short: event.target.value },
+                  })
+                }
+                rows={4}
+                className="w-full px-4 py-2 bg-background border border-foreground/20 rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-2">Full Bio</label>
+              <textarea
+                value={editingProfile.bio.full}
+                onChange={(event) =>
+                  setEditingProfile({
+                    ...editingProfile,
+                    bio: { ...editingProfile.bio, full: event.target.value },
+                  })
+                }
+                rows={10}
+                className="w-full px-4 py-2 bg-background border border-foreground/20 rounded-lg"
+              />
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-semibold mb-2">Mission</label>
             <textarea
@@ -679,6 +800,278 @@ export default function CMSPage() {
               onChange={(event) => setEditingProfile({ ...editingProfile, mission: event.target.value })}
               rows={4}
               className="w-full px-4 py-2 bg-background border border-foreground/20 rounded-lg"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold mb-2">Mission Supporting Statement</label>
+            <textarea
+              value={editingProfile.missionSupporting ?? ""}
+              onChange={(event) =>
+                setEditingProfile({ ...editingProfile, missionSupporting: event.target.value })
+              }
+              rows={3}
+              className="w-full px-4 py-2 bg-background border border-foreground/20 rounded-lg"
+              placeholder="Add an optional supporting paragraph for the mission section"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold">Core Philosophy Points</label>
+            {editingProfile.philosophy.map((item, index) => (
+              <div key={index} className="flex gap-2">
+                <textarea
+                  value={item}
+                  onChange={(event) => {
+                    const updated = [...editingProfile.philosophy];
+                    updated[index] = event.target.value;
+                    setEditingProfile({ ...editingProfile, philosophy: updated });
+                  }}
+                  rows={2}
+                  className="flex-1 px-4 py-2 bg-background border border-foreground/20 rounded-lg"
+                  placeholder={`Philosophy item ${index + 1}`}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setEditingProfile({
+                      ...editingProfile,
+                      philosophy: editingProfile.philosophy.filter((_, i) => i !== index),
+                    })
+                  }
+                >
+                  <X className="size-4" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setEditingProfile({
+                  ...editingProfile,
+                  philosophy: [...editingProfile.philosophy, ""],
+                })
+              }
+            >
+              <Plus className="size-4 mr-2" />
+              Add Philosophy Point
+            </Button>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold">Sectors</label>
+            {editingProfile.sectors.map((item, index) => (
+              <div key={index} className="flex gap-2">
+                <input
+                  value={item}
+                  onChange={(event) => {
+                    const updated = [...editingProfile.sectors];
+                    updated[index] = event.target.value;
+                    setEditingProfile({ ...editingProfile, sectors: updated });
+                  }}
+                  placeholder={`Sector ${index + 1}`}
+                  className="flex-1 px-4 py-2 bg-background border border-foreground/20 rounded-lg"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setEditingProfile({
+                      ...editingProfile,
+                      sectors: editingProfile.sectors.filter((_, i) => i !== index),
+                    })
+                  }
+                >
+                  <X className="size-4" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setEditingProfile({
+                  ...editingProfile,
+                  sectors: [...editingProfile.sectors, ""],
+                })
+              }
+            >
+              <Plus className="size-4 mr-2" />
+              Add Sector
+            </Button>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold">Regions</label>
+            {editingProfile.regions.map((item, index) => (
+              <div key={index} className="flex gap-2">
+                <input
+                  value={item}
+                  onChange={(event) => {
+                    const updated = [...editingProfile.regions];
+                    updated[index] = event.target.value;
+                    setEditingProfile({ ...editingProfile, regions: updated });
+                  }}
+                  placeholder={`Region ${index + 1}`}
+                  className="flex-1 px-4 py-2 bg-background border border-foreground/20 rounded-lg"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setEditingProfile({
+                      ...editingProfile,
+                      regions: editingProfile.regions.filter((_, i) => i !== index),
+                    })
+                  }
+                >
+                  <X className="size-4" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setEditingProfile({
+                  ...editingProfile,
+                  regions: [...editingProfile.regions, ""],
+                })
+              }
+            >
+              <Plus className="size-4 mr-2" />
+              Add Region
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-semibold">Approach Steps</label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setEditingProfile({
+                    ...editingProfile,
+                    approach: [...editingProfile.approach, createEmptyApproachStep()],
+                  })
+                }
+              >
+                <Plus className="size-4 mr-2" />
+                Add Step
+              </Button>
+            </div>
+
+            {editingProfile.approach.map((step, index) => (
+              <div key={index} className="border border-foreground/10 rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-foreground/70">Step {index + 1}</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setEditingProfile({
+                        ...editingProfile,
+                        approach: editingProfile.approach.filter((_, i) => i !== index),
+                      })
+                    }
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+                <Field
+                  label="Title"
+                  value={step.title}
+                  onChange={(value) => {
+                    const updated = editingProfile.approach.map((item, i) =>
+                      i === index ? { ...item, title: value } : item,
+                    );
+                    setEditingProfile({ ...editingProfile, approach: updated });
+                  }}
+                />
+                <div>
+                  <label className="block text-sm font-semibold mb-2">Description</label>
+                  <textarea
+                    value={step.description}
+                    onChange={(event) => {
+                      const updated = editingProfile.approach.map((item, i) =>
+                        i === index ? { ...item, description: event.target.value } : item,
+                      );
+                      setEditingProfile({ ...editingProfile, approach: updated });
+                    }}
+                    rows={3}
+                    className="w-full px-4 py-2 bg-background border border-foreground/20 rounded-lg"
+                  />
+                </div>
+                <Field
+                  label="Focus"
+                  value={step.focus ?? ""}
+                  onChange={(value) => {
+                    const updated = editingProfile.approach.map((item, i) =>
+                      i === index ? { ...item, focus: value } : item,
+                    );
+                    setEditingProfile({ ...editingProfile, approach: updated });
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-4">
+            <label className="text-sm font-semibold">Call To Action</label>
+            <Field
+              label="CTA Heading"
+              value={editingProfile.cta?.heading ?? ""}
+              onChange={(value) =>
+                setEditingProfile({
+                  ...editingProfile,
+                  cta: { ...(editingProfile.cta ?? { ...DEFAULT_CTA }), heading: value },
+                })
+              }
+            />
+            <div>
+              <label className="block text-sm font-semibold mb-2">CTA Body</label>
+              <textarea
+                value={editingProfile.cta?.body ?? ""}
+                onChange={(event) =>
+                  setEditingProfile({
+                    ...editingProfile,
+                    cta: { ...(editingProfile.cta ?? { ...DEFAULT_CTA }), body: event.target.value },
+                  })
+                }
+                rows={3}
+                className="w-full px-4 py-2 bg-background border border-foreground/20 rounded-lg"
+              />
+            </div>
+            <Field
+              label="CTA Button Label"
+              value={editingProfile.cta?.buttonLabel ?? ""}
+              onChange={(value) =>
+                setEditingProfile({
+                  ...editingProfile,
+                  cta: { ...(editingProfile.cta ?? { ...DEFAULT_CTA }), buttonLabel: value },
+                })
+              }
+            />
+            <Field
+              label="CTA Button Link"
+              value={editingProfile.cta?.buttonHref ?? ""}
+              onChange={(value) =>
+                setEditingProfile({
+                  ...editingProfile,
+                  cta: { ...(editingProfile.cta ?? { ...DEFAULT_CTA }), buttonHref: value },
+                })
+              }
             />
           </div>
         </Card>
@@ -695,6 +1088,15 @@ export default function CMSPage() {
               setEditingProfile({
                 ...profile,
                 stats: { ...profile.stats },
+                bio: { ...profile.bio },
+                philosophy: [...profile.philosophy],
+                sectors: [...profile.sectors],
+                regions: [...profile.regions],
+                approach:
+                  profile.approach.length > 0
+                    ? profile.approach.map((step) => ({ ...step }))
+                    : [createEmptyApproachStep()],
+                cta: profile.cta ? { ...profile.cta } : { ...DEFAULT_CTA },
               })
             }
           >

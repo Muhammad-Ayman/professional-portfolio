@@ -41,9 +41,17 @@ async function main() {
       bioShort: profileData.bio.short,
       bioFull: profileData.bio.full,
       mission: profileData.mission,
+      missionSupporting: profileData.missionSupporting,
       philosophy: profileData.philosophy,
       sectors: profileData.sectors,
       regions: profileData.regions,
+      approach: profileData.approach ?? [],
+      ctaHeading: profileData.cta?.heading ?? "Let's Work Together",
+      ctaBody:
+        profileData.cta?.body ??
+        "Whether you're looking to improve your proposal process, develop proposal strategy, or build a winning team, I'm here to help.",
+      ctaButtonLabel: profileData.cta?.buttonLabel ?? "Get in Touch",
+      ctaButtonHref: profileData.cta?.buttonHref ?? "/contact",
     },
     create: {
       id: "profile",
@@ -63,9 +71,17 @@ async function main() {
       bioShort: profileData.bio.short,
       bioFull: profileData.bio.full,
       mission: profileData.mission,
+      missionSupporting: profileData.missionSupporting,
       philosophy: profileData.philosophy,
       sectors: profileData.sectors,
       regions: profileData.regions,
+      approach: profileData.approach ?? [],
+      ctaHeading: profileData.cta?.heading ?? "Let's Work Together",
+      ctaBody:
+        profileData.cta?.body ??
+        "Whether you're looking to improve your proposal process, develop proposal strategy, or build a winning team, I'm here to help.",
+      ctaButtonLabel: profileData.cta?.buttonLabel ?? "Get in Touch",
+      ctaButtonHref: profileData.cta?.buttonHref ?? "/contact",
     },
   });
   console.log("✅ Profile seeded");

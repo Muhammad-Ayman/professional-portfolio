@@ -12,6 +12,23 @@ export const bioSchema = z.object({
   full: z.string(),
 });
 
+export const approachStepSchema = z
+  .object({
+    title: z.string(),
+    description: z.string(),
+    focus: z.string().optional(),
+  })
+  .strict();
+
+export const ctaSchema = z
+  .object({
+    heading: z.string(),
+    body: z.string(),
+    buttonLabel: z.string(),
+    buttonHref: z.string(),
+  })
+  .strict();
+
 export const profileSchema = z
   .object({
     name: z.string(),
@@ -26,9 +43,12 @@ export const profileSchema = z
     stats: statsSchema,
     bio: bioSchema,
     mission: z.string(),
+    missionSupporting: z.string().optional(),
     philosophy: z.array(z.string()),
     sectors: z.array(z.string()),
     regions: z.array(z.string()),
+    approach: z.array(approachStepSchema).optional().default([]),
+    cta: ctaSchema.optional(),
   })
   .strict();
 

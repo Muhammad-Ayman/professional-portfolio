@@ -1,12 +1,63 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { ArrowRight, Globe, Briefcase, Users } from "lucide-react";
+import { ArrowRight, Globe, Briefcase } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
 import { buildPageSEO } from "@/lib/seo";
 import { Spinner } from "@/components/ui/spinner";
 import { useProfile } from "@/hooks/useContent";
 import HoverImage from "@/components/HoverImage";
 import LottieAnimation from "@/components/LottieAnimation";
+import type { ApproachStep, ProfileCTA } from "@/types/content";
+
+const DEFAULT_MISSION_SUPPORTING =
+  "I aim to elevate the quality of proposal development across the sector transforming fragmented inputs into cohesive, fundable solutions that drive employment, digital transformation, and inclusive growth.";
+
+const DEFAULT_APPROACH_STEPS: ApproachStep[] = [
+  {
+    title: "Deep Understanding Before Action",
+    description:
+      "Every engagement begins with clarity. I start by mapping the mandate, donor expectations, relevant policies, and the competitive landscape.",
+    focus: "Focus: Needs analysis, RFP deconstruction, stakeholder alignment.",
+  },
+  {
+    title: "Strategy-Led Proposal Architecture",
+    description:
+      "Winning proposals require more than good writing—they need a strong core. I build a strategic framework that defines the solution, the differentiators, the impact pathways, and the technical scoring logic.",
+    focus: "Focus: Value proposition, solution logic, theory of change, scoring strategy.",
+  },
+  {
+    title: "Collaborative, High-Performance Delivery",
+    description:
+      "I work as an extension of the internal team, creating a structured environment where technical experts, managers, and partners contribute effectively.",
+    focus: "Focus: Team coordination, input management, structured workflows.",
+  },
+  {
+    title: "Precision, Compliance & Quality Assurance",
+    description:
+      "Compliance is the foundation of competitiveness. I apply quality checks across all components—technical, financial, operational, and annexes—to ensure the submission meets every requirement and maximizes evaluation scores.",
+    focus: "Focus: Checklists, compliance matrices, revision cycles, formatting standards.",
+  },
+  {
+    title: "Impact-Centered Design",
+    description:
+      "Strong proposals do more than answer questions—they demonstrate long-term value. I design programs with clear KPIs, sustainability mechanisms, risk strategies, and measurable outcomes, ensuring proposals are not only fundable but implementable at scale.",
+    focus: "Focus: KPIs, M&E logic, sustainability models, risk mitigation.",
+  },
+  {
+    title: "Delivery That Builds Internal Capacity",
+    description:
+      "My approach strengthens organizations beyond a single submission. I transfer processes, templates, and systems that help teams operate more efficiently and independently in future bids.",
+    focus: "Focus: Templates, playbooks, knowledge transfer, continuous improvement.",
+  },
+];
+
+const DEFAULT_CTA: ProfileCTA = {
+  heading: "Let's Work Together",
+  body:
+    "Whether you're looking to improve your proposal process, develop proposal strategy, or build a winning team, I'm here to help.",
+  buttonLabel: "Get in Touch",
+  buttonHref: "/contact",
+};
 
 export default function About() {
   const { data: profile, isLoading, isError } = useProfile();
@@ -34,6 +85,10 @@ export default function About() {
   }
 
   const pageMetadata = buildPageSEO(profile).about;
+  const missionSupporting = profile.missionSupporting?.trim() || DEFAULT_MISSION_SUPPORTING;
+  const approachSteps = profile.approach.length ? profile.approach : DEFAULT_APPROACH_STEPS;
+  const cta = profile.cta ?? DEFAULT_CTA;
+  const isCTAExternal = cta.buttonHref.startsWith("http://") || cta.buttonHref.startsWith("https://");
 
   return (
     <div className="w-full">
@@ -115,7 +170,7 @@ export default function About() {
                 {profile.mission}
               </p>
               <p className="text-foreground/60">
-              I aim to elevate the quality of proposal development across the sector transforming fragmented inputs into cohesive, fundable solutions that drive employment, digital transformation, and inclusive growth.
+                {missionSupporting}
               </p>
             </div>
 
@@ -210,95 +265,26 @@ export default function About() {
           </h2>
 
           <div className="space-y-8">
-            <div className="flex gap-6 animate-fadeInUp">
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary/10">
-                  <span className="text-primary font-bold text-lg">1</span>
+            {approachSteps.map((step, index) => (
+              <div
+                key={`${step.title}-${index}`}
+                className="flex gap-6 animate-fadeInUp"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="flex-shrink-0">
+                  <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary/10">
+                    <span className="text-primary font-bold text-lg">{index + 1}</span>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
+                  <p className="text-foreground/70 mb-2">{step.description}</p>
+                  {step.focus && (
+                    <p className="text-sm text-primary font-medium">{step.focus}</p>
+                  )}
                 </div>
               </div>
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Deep Understanding Before Action</h3>
-                <p className="text-foreground/70 mb-2">
-                  Every engagement begins with clarity. I start by mapping the mandate, donor expectations, relevant policies, and the competitive landscape.
-                </p>
-                <p className="text-sm text-primary font-medium">Focus: Needs analysis, RFP deconstruction, stakeholder alignment.</p>
-              </div>
-            </div>
-
-            <div className="flex gap-6 animate-fadeInUp" style={{ animationDelay: "100ms" }}>
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary/10">
-                  <span className="text-primary font-bold text-lg">2</span>
-                </div>
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Strategy-Led Proposal Architecture</h3>
-                <p className="text-foreground/70 mb-2">
-                  Winning proposals require more than good writing—they need a strong core. I build a strategic framework that defines the solution, the differentiators, the impact pathways, and the technical scoring logic.
-                </p>
-                <p className="text-sm text-primary font-medium">Focus: Value proposition, solution logic, theory of change, scoring strategy.</p>
-              </div>
-            </div>
-
-            <div className="flex gap-6 animate-fadeInUp" style={{ animationDelay: "200ms" }}>
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary/10">
-                  <span className="text-primary font-bold text-lg">3</span>
-                </div>
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Collaborative, High-Performance Delivery</h3>
-                <p className="text-foreground/70 mb-2">
-                  I work as an extension of the internal team, creating a structured environment where technical experts, managers, and partners contribute effectively.
-                </p>
-                <p className="text-sm text-primary font-medium">Focus: Team coordination, input management, structured workflows.</p>
-              </div>
-            </div>
-
-            <div className="flex gap-6 animate-fadeInUp" style={{ animationDelay: "300ms" }}>
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary/10">
-                  <span className="text-primary font-bold text-lg">4</span>
-                </div>
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Precision, Compliance & Quality Assurance</h3>
-                <p className="text-foreground/70 mb-2">
-                  Compliance is the foundation of competitiveness. I apply quality checks across all components—technical, financial, operational, and annexes—to ensure the submission meets every requirement and maximizes evaluation scores.
-                </p>
-                <p className="text-sm text-primary font-medium">Focus: Checklists, compliance matrices, revision cycles, formatting standards.</p>
-              </div>
-            </div>
-
-            <div className="flex gap-6 animate-fadeInUp" style={{ animationDelay: "400ms" }}>
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary/10">
-                  <span className="text-primary font-bold text-lg">5</span>
-                </div>
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Impact-Centered Design</h3>
-                <p className="text-foreground/70 mb-2">
-                  Strong proposals do more than answer questions—they demonstrate long-term value. I design programs with clear KPIs, sustainability mechanisms, risk strategies, and measurable outcomes, ensuring proposals are not only fundable but implementable at scale.
-                </p>
-                <p className="text-sm text-primary font-medium">Focus: KPIs, M&E logic, sustainability models, risk mitigation.</p>
-              </div>
-            </div>
-
-            <div className="flex gap-6 animate-fadeInUp" style={{ animationDelay: "500ms" }}>
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary/10">
-                  <span className="text-primary font-bold text-lg">6</span>
-                </div>
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Delivery That Builds Internal Capacity</h3>
-                <p className="text-foreground/70 mb-2">
-                  My approach strengthens organizations beyond a single submission. I transfer processes, templates, and systems that help teams operate more efficiently and independently in future bids.
-                </p>
-                <p className="text-sm text-primary font-medium">Focus: Templates, playbooks, knowledge transfer, continuous improvement.</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -307,17 +293,30 @@ export default function About() {
       <section className="section-padding">
         <div className="container max-w-3xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-display font-bold mb-6">
-            Let's Work Together
+            {cta.heading}
           </h2>
           <p className="text-lg text-foreground/70 mb-8">
-            Whether you're looking to improve your proposal process, develop proposal strategy, or build a winning team, I'm here to help.
+            {cta.body}
           </p>
-          <Link href="/contact">
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-base font-semibold group">
-              Get in Touch
-              <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
-            </Button>
-          </Link>
+          {isCTAExternal ? (
+            <a
+              href={cta.buttonHref || DEFAULT_CTA.buttonHref}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-base font-semibold group">
+                {cta.buttonLabel || DEFAULT_CTA.buttonLabel}
+                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+              </Button>
+            </a>
+          ) : (
+            <Link href={cta.buttonHref || DEFAULT_CTA.buttonHref}>
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-base font-semibold group">
+                {cta.buttonLabel || DEFAULT_CTA.buttonLabel}
+                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+              </Button>
+            </Link>
+          )}
         </div>
       </section>
     </div>
