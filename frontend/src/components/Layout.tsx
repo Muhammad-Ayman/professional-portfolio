@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X, Linkedin } from "lucide-react";
 
 interface LayoutProps {
@@ -9,6 +9,9 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMerzaOverlayOpen, setIsMerzaOverlayOpen] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+  const [showCustomCursor, setShowCustomCursor] = useState(false);
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -18,8 +21,91 @@ export default function Layout({ children }: LayoutProps) {
     { href: "/contact", label: "Contact" },
   ];
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mediaQuery = window.matchMedia("(pointer: fine)");
+    if (!mediaQuery.matches) return;
+
+    const handleMove = (event: MouseEvent) => {
+      setCursorPosition({ x: event.clientX, y: event.clientY });
+      setShowCustomCursor(true);
+    };
+
+    const handleLeave = () => setShowCustomCursor(false);
+
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseleave", handleLeave);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseleave", handleLeave);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isMerzaOverlayOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMerzaOverlayOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isMerzaOverlayOpen]);
+
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
+    <div className="min-h-screen flex flex-col bg-background text-foreground cursor-auto md:cursor-none">
+      {showCustomCursor && (
+        <div
+          className="pointer-events-none fixed z-[80] hidden md:block transition-transform duration-150 ease-out"
+          style={{ transform: `translate3d(${cursorPosition.x - 15}px, ${cursorPosition.y - 15}px, 0)` }}
+        >
+          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-sky-400/70 via-indigo-500/70 to-violet-500/70 blur-[1px] shadow-[0_0_22px_rgba(99,102,241,0.3)]" />
+        </div>
+      )}
+
+      {isMerzaOverlayOpen && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-background/70 backdrop-blur-3xl px-6 py-12"
+          onClick={() => setIsMerzaOverlayOpen(false)}
+        >
+          <div
+            className="relative max-w-3xl w-full text-center text-muted-foreground/95"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex justify-end">
+              <Button
+                variant="ghost"
+                className="text-muted-foreground hover:text-foreground"
+                onClick={() => setIsMerzaOverlayOpen(false)}
+                aria-label="Close Merza Group teaser"
+              >
+                <X className="size-5" />
+              </Button>
+            </div>
+            <div className="space-y-6 text-lg md:text-xl px-2 pb-2">
+              <p className="font-display text-3xl md:text-4xl font-semibold text-foreground">
+                A new legacy is being engineered.
+              </p>
+              <p>Merza Group is preparing its breakthrough —</p>
+              <p>and what comes next will speak for itself.</p>
+              <p className="text-sm tracking-[0.3em] uppercase text-primary/80">
+                Watch this space — closely.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
         <nav className="container flex items-center justify-between py-4">
@@ -35,6 +121,15 @@ export default function Layout({ children }: LayoutProps) {
                 {link.label}
               </Link>
             ))}
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-[10px] uppercase tracking-[0.35em] text-primary/70">Soon</span>
+              <Button
+                className="bg-gradient-to-r from-sky-500 via-indigo-500 to-violet-500 text-white shadow-lg hover:opacity-90 transition-opacity"
+                onClick={() => setIsMerzaOverlayOpen(true)}
+              >
+                Merza Group
+              </Button>
+            </div>
             <Link href="/contact">
               <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
                 Get in Touch
@@ -66,6 +161,18 @@ export default function Layout({ children }: LayoutProps) {
                   {link.label}
                 </Link>
               ))}
+              <div className="flex flex-col items-start gap-2 border border-dashed border-primary/30 rounded-xl p-4 bg-background/80">
+                <span className="text-[10px] uppercase tracking-[0.3em] text-primary/70">Soon</span>
+                <Button
+                  className="bg-gradient-to-r from-sky-500 via-indigo-500 to-violet-500 text-white shadow-lg hover:opacity-95 transition-opacity"
+                  onClick={() => {
+                    setIsMerzaOverlayOpen(true);
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Merza Group
+                </Button>
+              </div>
               <Link href="/contact" onClick={() => setIsMenuOpen(false)}>
                 <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
                   Get in Touch
