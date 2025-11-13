@@ -91,7 +91,7 @@ export default function Layout({ children }: LayoutProps) {
                 Mohamed Merza
               </h3>
               <p className="text-sm text-muted-foreground max-w-xs">
-                Proposal Strategy Expert | Leadership Consultant | Business Development Professional
+              Proposals Leader | Bid Management Expert | Growth Advisor
               </p>
             </div>
 

@@ -306,6 +306,10 @@
     font-family: 'Playfair Display', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   }
 
+  .font-roboto {
+    font-family: 'Roboto', ui-sans-serif, system-ui, -apple-system, Segoe UI, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+
   .font-sans {
     font-family: 'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
   }
