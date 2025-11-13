@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Menu, X, Linkedin } from "lucide-react";
@@ -12,6 +12,7 @@ export default function Layout({ children }: LayoutProps) {
   const [isMerzaOverlayOpen, setIsMerzaOverlayOpen] = useState(false);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [showCustomCursor, setShowCustomCursor] = useState(false);
+  const [location] = useLocation();
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -20,6 +21,42 @@ export default function Layout({ children }: LayoutProps) {
     { href: "/insights", label: "Insights" },
     { href: "/contact", label: "Contact" },
   ];
+
+  // Helper function to handle scroll on link click
+  const handleLinkClick = (href: string) => {
+    // Close mobile menu if open
+    setIsMenuOpen(false);
+    
+    // If it's a hash link on the same page, scroll to it immediately
+    if (href.startsWith("#")) {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  };
+
+  // Scroll to top or to hash section on route change
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // Check if URL has a hash (e.g., /about#section)
+    const hash = window.location.hash;
+    
+    if (hash) {
+      // Wait for the page to render, then scroll to the element
+      setTimeout(() => {
+        const element = document.querySelector(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
+      }, 100);
+    } else {
+      // No hash, scroll to top
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [location]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -128,14 +165,14 @@ export default function Layout({ children }: LayoutProps) {
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
         <nav className="container flex items-center justify-between py-4">
           {/* Logo */}
-          <Link href="/" className="text-2xl font-display font-bold text-gradient hover:opacity-80 transition-opacity">
+          <Link href="/" onClick={() => handleLinkClick("/")} className="text-2xl font-display font-bold text-gradient hover:opacity-80 transition-opacity">
           Mohamed Salah Merza
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="text-sm font-medium hover:text-primary transition-colors">
+              <Link key={link.href} href={link.href} onClick={() => handleLinkClick(link.href)} className="text-sm font-medium hover:text-primary transition-colors">
                 {link.label}
               </Link>
             ))}
@@ -156,7 +193,7 @@ export default function Layout({ children }: LayoutProps) {
                 </span>
               </span>
             </Button>
-            <Link href="/contact">
+            <Link href="/contact" onClick={() => handleLinkClick("/contact")}>
               <Button className="bg-primary hover:bg-primary/90 text-slate-900 dark:text-slate-950">
                 Get in Touch
               </Button>
@@ -182,7 +219,7 @@ export default function Layout({ children }: LayoutProps) {
                   key={link.href}
                   href={link.href}
                   className="text-sm font-medium hover:text-primary transition-colors block py-2"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => handleLinkClick(link.href)}
                 >
                   {link.label}
                 </Link>
@@ -207,7 +244,7 @@ export default function Layout({ children }: LayoutProps) {
                   </span>
                 </span>
               </Button>
-              <Link href="/contact" onClick={() => setIsMenuOpen(false)}>
+              <Link href="/contact" onClick={() => handleLinkClick("/contact")}>
                 <Button className="w-full bg-primary hover:bg-primary/90 text-slate-900 dark:text-slate-950">
                   Get in Touch
                 </Button>
@@ -242,7 +279,7 @@ export default function Layout({ children }: LayoutProps) {
               <ul className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
                 {navLinks.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className="text-muted-foreground hover:text-primary transition-colors">
+                    <Link href={link.href} onClick={() => handleLinkClick(link.href)} className="text-muted-foreground hover:text-primary transition-colors">
                       {link.label}
                     </Link>
                   </li>
