@@ -68,7 +68,7 @@ export default function Home() {
             <h1 className="text-6xl md:text-7xl lg:text-8xl font-display font-bold mb-4 leading-tight">
               {profile.name}
             </h1>
-            <p className="text-2xl md:text-3xl text-primary font-light mb-6">
+            <p className="text-2xl md:text-3xl font-light mb-6 gradient-text">
               {profile.title}
             </p>
 
@@ -80,25 +80,25 @@ export default function Home() {
             {/* Key Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12 py-8 border-t border-b border-foreground/10">
               <div>
-                <div className="text-3xl md:text-4xl font-display font-bold text-primary">
+                <div className="text-3xl md:text-4xl font-display font-bold gradient-text">
                   {isProfileLoading ? <Spinner className="size-6" /> : profile.stats.yearsOfExperience}
                 </div>
                 <p className="text-sm text-foreground/60 mt-2">Years of experience</p>
               </div>
               <div>
-                <div className="text-3xl md:text-4xl font-display font-bold text-primary">
+                <div className="text-3xl md:text-4xl font-display font-bold gradient-text">
                   {isProfileLoading ? <Spinner className="size-6" /> : profile.stats.totalFundingSecured}
                 </div>
                 <p className="text-sm text-foreground/60 mt-2">Total Funding Secured</p>
               </div>
               <div>
-                <div className="text-3xl md:text-4xl font-display font-bold text-primary">
+                <div className="text-3xl md:text-4xl font-display font-bold gradient-text">
                   {isProfileLoading ? <Spinner className="size-6" /> : profile.stats.countries}
                 </div>
                 <p className="text-sm text-foreground/60 mt-2">Countries</p>
               </div>
               <div>
-                <div className="text-3xl md:text-4xl font-display font-bold text-primary">
+                <div className="text-3xl md:text-4xl font-display font-bold gradient-text">
                   {isProfileLoading ? <Spinner className="size-6" /> : profile.stats.winningRate}
                 </div>
                 <p className="text-sm text-foreground/60 mt-2">Winning Rate</p>

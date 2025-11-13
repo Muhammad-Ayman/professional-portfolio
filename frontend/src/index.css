@@ -44,14 +44,15 @@
 }
 
 :root {
-  --primary: #C1A35F;
+  --gradient-cta: linear-gradient(90deg, #FF8100 0%, #DFAE00 100%);
+  --primary: #DFAE00;
   --primary-foreground: oklch(0.98 0 0);
-  --sidebar-primary: #C1A35F;
+  --sidebar-primary: #DFAE00;
   --sidebar-primary-foreground: oklch(0.12 0 0);
   --chart-1: #D4AF37;
-  --chart-2: #C1A35F;
+  --chart-2: #DFAE00;
   --chart-3: #D4AF37;
-  --chart-4: #C1A35F;
+  --chart-4: #DFAE00;
   --chart-5: #D4AF37;
   --radius: 0.65rem;
   --background: oklch(0.08 0 0);
@@ -64,25 +65,26 @@
   --secondary-foreground: oklch(0.98 0 0);
   --muted: oklch(0.25 0 0);
   --muted-foreground: oklch(0.75 0 0);
-  --accent: #C1A35F;
+  --accent: #DFAE00;
   --accent-foreground: oklch(0.12 0 0);
   --destructive: oklch(0.63 0.24 29);
   --destructive-foreground: oklch(0.98 0 0);
   --border: oklch(0.25 0 0);
   --input: oklch(0.15 0 0);
-  --ring: #C1A35F;
+  --ring: #DFAE00;
   --sidebar: oklch(0.15 0 0);
   --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-accent: #C1A35F;
+  --sidebar-accent: #DFAE00;
   --sidebar-accent-foreground: oklch(0.12 0 0);
   --sidebar-border: oklch(0.25 0 0);
-  --sidebar-ring: #C1A35F;
+  --sidebar-ring: #DFAE00;
 }
 
 .dark {
-  --primary: #C1A35F;
+  --gradient-cta: linear-gradient(90deg, #FF8100 0%, #DFAE00 100%);
+  --primary: #DFAE00;
   --primary-foreground: oklch(0.98 0 0);
-  --sidebar-primary: #C1A35F;
+  --sidebar-primary: #DFAE00;
   --sidebar-primary-foreground: oklch(0.12 0 0);
   --background: oklch(0.08 0 0);
   --foreground: oklch(0.99 0 0);
@@ -94,24 +96,24 @@
   --secondary-foreground: oklch(0.98 0 0);
   --muted: oklch(0.25 0 0);
   --muted-foreground: oklch(0.75 0 0);
-  --accent: #C1A35F;
+  --accent: #DFAE00;
   --accent-foreground: oklch(0.12 0 0);
   --destructive: oklch(0.63 0.24 29);
   --destructive-foreground: oklch(0.98 0 0);
   --border: oklch(0.25 0 0);
   --input: oklch(0.15 0 0);
-  --ring: #C1A35F;
+  --ring: #DFAE00;
   --chart-1: #D4AF37;
-  --chart-2: #C1A35F;
+  --chart-2: #DFAE00;
   --chart-3: #D4AF37;
-  --chart-4: #C1A35F;
+  --chart-4: #DFAE00;
   --chart-5: #D4AF37;
   --sidebar: oklch(0.15 0 0);
   --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-accent: #C1A35F;
+  --sidebar-accent: #DFAE00;
   --sidebar-accent-foreground: oklch(0.12 0 0);
   --sidebar-border: oklch(0.25 0 0);
-  --sidebar-ring: #C1A35F;
+  --sidebar-ring: #DFAE00;
 }
 
 @layer base {
@@ -120,6 +122,27 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  button {
+    background-image: var(--gradient-cta);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    color: var(--primary-foreground);
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  span,
+  strong,
+  em,
+  small,
+  label,
+  a {
+    color: var(--foreground);
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
@@ -260,20 +283,31 @@
 
 @layer components {
   /* Typography utilities */
+  .gradient-text {
+    color: var(--foreground);
+    background-image: var(--gradient-cta);
+    background-clip: text;
+    -webkit-background-clip: text;
+  }
+  .text-gradient {
+    color: var(--foreground);
+    background-image: var(--gradient-cta);
+    background-clip: text;
+    -webkit-background-clip: text;
+  }
+  @supports (background-clip: text) or (-webkit-background-clip: text) {
+    .gradient-text,
+    .text-gradient {
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+  }
   .font-display {
     font-family: 'Playfair Display', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   }
 
   .font-sans {
     font-family: 'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
-  }
-
-  /* Gradient text */
-  .text-gradient {
-    background: linear-gradient(135deg, #D4AF37 0%, #C1A35F 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
   }
 
   /* Elegant button styles */
@@ -305,6 +339,9 @@
 }
 
 @layer utilities {
+  .bg-gradient-cta {
+    background-image: var(--gradient-cta);
+  }
   .animate-fadeInUp {
     animation: fadeInUp 0.6s ease-out;
   }
