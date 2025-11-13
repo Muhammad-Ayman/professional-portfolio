@@ -25,7 +25,7 @@ export default function Layout({ children }: LayoutProps) {
         <nav className="container flex items-center justify-between py-4">
           {/* Logo */}
           <Link href="/" className="text-2xl font-display font-bold text-gradient hover:opacity-80 transition-opacity">
-          Mohamed Merza
+          Mohamed Salah Merza
           </Link>
 
           {/* Desktop Navigation */}
@@ -88,7 +88,7 @@ export default function Layout({ children }: LayoutProps) {
             {/* Brand */}
             <div className="md:col-span-4">
               <h3 className="text-2xl font-display font-bold text-gradient mb-4">
-                Mohamed Merza
+                Mohamed Salah Merza
               </h3>
               <p className="text-sm text-muted-foreground max-w-xs">
               Proposals Leader | Bid Management Expert | Growth Advisor
@@ -131,7 +131,7 @@ export default function Layout({ children }: LayoutProps) {
           {/* Copyright */}
           <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
             <p>
-              &copy; {new Date().getFullYear()} Mohamed Merza. All rights reserved.
+              &copy; {new Date().getFullYear()} Mohamed Salah Merza. All rights reserved.
             </p>
           </div>
         </div>

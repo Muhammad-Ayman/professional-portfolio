@@ -214,7 +214,7 @@ export default function Contact() {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 bg-background border border-foreground/20 rounded-lg text-foreground placeholder-foreground/50 focus:outline-none focus:border-primary transition-colors"
-                      placeholder="Mohamed Merza"
+                      placeholder="Mohamed Salah Merza"
                     />
                   </div>
 
