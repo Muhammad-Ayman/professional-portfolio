@@ -116,7 +116,7 @@ export default function Home() {
               <Link href="/contact">
                 <Button
                   variant="outline"
-                  className="px-8 py-6 text-base font-semibold border-foreground/20 text-foreground hover:bg-foreground/5"
+                  className="px-8 py-6 text-base font-semibold border-foreground/20 text-slate-900 hover:bg-foreground/5"
                 >
                   Let's Connect
                 </Button>
