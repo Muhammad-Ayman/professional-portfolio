@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
 import emailjs from "@emailjs/browser";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -118,11 +118,45 @@ export default function CMSPage() {
   const [editingCaseStudy, setEditingCaseStudy] = useState<CaseStudy | null>(null);
   const [editingInsight, setEditingInsight] = useState<Insight | null>(null);
   const [editingFAQ, setEditingFAQ] = useState<FAQ | null>(null);
+  const [showTokenForm, setShowTokenForm] = useState(false);
+  const [newAdminToken, setNewAdminToken] = useState("");
+  const [isUpdatingAdminToken, setIsUpdatingAdminToken] = useState(false);
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     setToken("");
     localStorage.removeItem(CMS_TOKEN_KEY);
+  };
+
+  const handleAdminTokenUpdate = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmedToken = newAdminToken.trim();
+
+    if (!trimmedToken) {
+      toast.error("Token cannot be empty");
+      return;
+    }
+
+    setIsUpdatingAdminToken(true);
+    try {
+      await authorizedRequest("/content/admin-token", {
+        method: "PUT",
+        body: JSON.stringify({ token: trimmedToken }),
+      });
+
+      setToken(trimmedToken);
+      localStorage.setItem(CMS_TOKEN_KEY, trimmedToken);
+      toast.success("Admin token updated. Store it securely for future access.");
+      setShowTokenForm(false);
+      setNewAdminToken("");
+      await loadAllContent(trimmedToken);
+    } catch (error) {
+      toast.error(
+        `Failed to update admin token: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+    } finally {
+      setIsUpdatingAdminToken(false);
+    }
   };
 
   const authorizedRequest = async <T,>(endpoint: string, options: RequestInit = {}) => {
@@ -717,13 +751,62 @@ export default function CMSPage() {
         <header className="border-b border-foreground/10 bg-background/80 backdrop-blur-md sticky top-0 z-50">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <h1 className="text-2xl font-bold">Content Management System</h1>
-            <Button variant="outline" onClick={handleLogout}>
-              Logout
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" onClick={() => setShowTokenForm((value) => !value)}>
+                {showTokenForm ? "Cancel" : "Change Token"}
+              </Button>
+              <Button variant="outline" onClick={handleLogout}>
+                Logout
+              </Button>
+            </div>
           </div>
         </header>
 
         <div className="container mx-auto px-4 py-8">
+          {showTokenForm && (
+            <Card className="mb-8 border border-primary/20">
+              <form onSubmit={(event) => void handleAdminTokenUpdate(event)} className="space-y-4 p-6">
+                <div>
+                  <h2 className="text-lg font-semibold mb-1">Update Admin Token</h2>
+                  <p className="text-sm text-foreground/60">
+                    Enter a new token for CMS access. Save it securely—you will need it for the next login.
+                  </p>
+                </div>
+                <input
+                  type="password"
+                  value={newAdminToken}
+                  onChange={(event) => setNewAdminToken(event.target.value)}
+                  placeholder="New CMS admin token"
+                  className="w-full px-4 py-3 bg-background border border-foreground/20 rounded-lg text-foreground placeholder-foreground/50 focus:outline-none focus:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isUpdatingAdminToken}
+                />
+                <div className="flex items-center justify-end gap-3">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setShowTokenForm(false);
+                      setNewAdminToken("");
+                    }}
+                    disabled={isUpdatingAdminToken}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isUpdatingAdminToken}>
+                    {isUpdatingAdminToken ? (
+                      <span className="flex items-center gap-2">
+                        <Spinner className="size-4" />
+                        Saving...
+                      </span>
+                    ) : (
+                      "Save Token"
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Card>
+          )}
+
           <Tabs defaultValue="profile" className="w-full">
             <TabsList className="grid w-full grid-cols-4 mb-8">
               <TabsTrigger value="profile">Profile</TabsTrigger>
